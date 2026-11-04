@@ -71,18 +71,73 @@ Git te imprime un enlace en el terminal: ábrelo para crear el PR (paso 6). Si u
 
 Ambos son asistentes de IA que corren en tu terminal, leen tu repo y ejecutan los comandos de git por ti. Sirve si no quieres memorizar nada.
 
-### Una sola vez
-1. Ten el repo clonado (ver Opción B) y **Node.js** instalado.
-2. Instala **uno** de los dos:
-   - Claude Code: `npm install -g @anthropic-ai/claude-code`
-   - Codex: `npm install -g @openai/codex`
-3. Instala y conecta la CLI de GitHub para que pueda crear el PR: `gh auth login`.
-4. Entra a la carpeta del repo y abre el asistente:
-   ```bash
-   cd mcdi500-tmdb-grupo4
-   claude        # o:  codex
+### Antes de empezar: qué es "la terminal"
+Es una ventana negra donde escribes órdenes en vez de hacer clic. No rompe nada por abrirla. Cada vez que esta guía diga "escribe esto", copia el texto, pégalo en la terminal (clic derecho o `Ctrl+V`) y pulsa **Enter**.
+
+**Cómo abrirla en Windows:** tecla Windows → escribe `PowerShell` → Enter.
+**En macOS:** `Cmd + Espacio` → escribe `Terminal` → Enter.
+
+**Truco para abrirla en la carpeta correcta:** abre la carpeta del repo en el Explorador de archivos, haz clic en la barra de dirección de arriba, escribe `powershell` y pulsa Enter. Se abre la terminal ya dentro de esa carpeta.
+
+### Una sola vez: instalar lo necesario
+
+**Paso 1 · Instalar Git** (el programa que guarda las versiones)
+1. Descarga desde https://git-scm.com/downloads e instala dando **Next** a todo.
+2. Cierra y vuelve a abrir la terminal. Comprueba que quedó bien:
    ```
-   La primera vez te pedirá iniciar sesión.
+   git --version
+   ```
+   Debe responder algo como `git version 2.x.x`.
+
+**Paso 2 · Instalar Node.js** (lo necesitan los asistentes para funcionar)
+1. Descarga la versión **LTS** desde https://nodejs.org e instala dando **Next** a todo.
+2. Cierra y vuelve a abrir la terminal. Comprueba:
+   ```
+   node --version
+   ```
+   Debe mostrar un número de versión (ej. `v22.x.x`).
+
+**Paso 3 · Instalar el asistente** (elige **uno**)
+
+| Asistente | Comando de instalación | Para abrirlo | Cuenta que necesitas |
+|-----------|------------------------|--------------|----------------------|
+| Claude Code | `npm install -g @anthropic-ai/claude-code` | `claude` | Cuenta de Claude de pago (Pro o superior) o créditos de API |
+| Codex | `npm install -g @openai/codex` | `codex` | Cuenta de ChatGPT (Plus o superior) o API key de OpenAI |
+
+Pega el comando de instalación, pulsa Enter y espera a que termine (1–2 minutos, saldrá mucho texto: es normal). Comprueba:
+```
+claude --version      # o:  codex --version
+```
+Si responde con un número de versión, ya lo tienes.
+
+> **Si dice "no se reconoce el comando"** o `claude`/`codex` no se encuentra: cierra **todas** las terminales y abre una nueva. Si sigue igual, repite el Paso 2 (Node.js) y reinicia el computador.
+>
+> **Si en Windows sale un error rojo de "scripts deshabilitados"** (`running scripts is disabled`): ejecuta una vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, responde `S` y vuelve a intentar.
+
+**Paso 4 · Conectar GitHub** (para que el asistente pueda crear el PR)
+1. Instala la CLI de GitHub desde https://cli.github.com e instala dando **Next** a todo. Reabre la terminal.
+2. Escribe:
+   ```
+   gh auth login
+   ```
+3. Elige con las flechas y Enter: **GitHub.com** → **HTTPS** → **Yes** (autenticar git) → **Login with a web browser**.
+4. Copia el código de 8 caracteres que aparece, pulsa Enter, se abre el navegador, pega el código e inicia sesión con **tu** cuenta de GitHub.
+
+**Paso 5 · Clonar el repo** (si aún no lo tienes; ver Opción B)
+```
+git clone https://github.com/yetgx/mcdi500-tmdb-grupo4.git
+```
+
+### Cada vez: abrir el asistente dentro del repo
+1. Abre la terminal **dentro de la carpeta del repo** (truco de arriba) o navega con:
+   ```
+   cd ruta\a\mcdi500-tmdb-grupo4
+   ```
+2. Escribe `claude` (o `codex`) y pulsa Enter.
+3. **Primera vez:** te pide iniciar sesión. Se abre el navegador, entras con tu cuenta y vuelves a la terminal.
+4. Te preguntará si **confías en esa carpeta**: responde que sí (es tu repo).
+5. Verás una caja donde escribir. Ahí pegas el prompt de abajo y pulsas Enter.
+6. Cuando te pida permiso para ejecutar algo, lee y elige **Yes** / **Aprobar**. Para salir: escribe `/exit` o pulsa `Ctrl+C` dos veces.
 
 ### Cada vez: pega este prompt
 ```
