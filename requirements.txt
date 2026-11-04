@@ -1,0 +1,5 @@
+ipykernel
+jupyterlab
+notebook
+numpy==2.5.4
+pandas==3.1.0

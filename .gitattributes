@@ -1,0 +1,4 @@
+* text=auto
+*.csv -text
+data/raw/** -text
+*.ipynb text eol=lf
