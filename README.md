@@ -1,11 +1,12 @@
-# Películas TMDB 2010–2025 — Grupo X
+# Películas TMDB 2010–2025 — Grupo 4
 
 Proyecto de MCDI500 (Programación para la Ciencia de Datos, Magíster en Ciencia de Datos e Inteligencia Artificial, UNAB). Trabaja con un extracto de The Movie Database (TMDB) con estrenos entre 2010 y 2025: presupuesto, recaudación, duración, géneros, productoras, países, idiomas, valoración y popularidad. La definición del problema y los objetivos se completan en la Fase 1 (`F1/`).
 
 ## Integrantes
-- Nombre Apellido (@yetgx)
-- Nombre Apellido (@Daninela)
-- Nombre Apellido (@EliasManriquez)
+- Yestxander Rada (@yetgx)
+- Daniela Baeza (@Daninela)
+- Elías Manríquez (@EliasManriquez)
+- Juan Pablo González (@jp-IArtificial) 
 
 ## Datos
 - Fuente: TMDB Raw Movie Dataset (2010–2025), Evan Christiawan (Binus University), Zenodo.
