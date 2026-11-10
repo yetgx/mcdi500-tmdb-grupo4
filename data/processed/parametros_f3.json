@@ -1,0 +1,29 @@
+{
+  "semilla": 42,
+  "fraccion_prueba": 0.2,
+  "pasos": {
+    "ConstructorSopa(metadata_soup)": {
+      "origen": {
+        "genero": "genres",
+        "productoras": "production_companies",
+        "idioma": "original_language"
+      },
+      "max_productoras": 3
+    },
+    "LogNaturalPlus1(popularity)": {
+      "minimo": 0.0079
+    },
+    "EscaladorMinMax(vote_average)": {
+      "minimo": 1.832,
+      "rango": 8.068
+    },
+    "EscaladorMinMax(vote_count)": {
+      "minimo": 50.0,
+      "rango": 38764.0
+    },
+    "EscaladorMinMax(popularity)": {
+      "minimo": 0.00786895837869518,
+      "rango": 4.644749539516677
+    }
+  }
+}

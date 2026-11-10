@@ -22,7 +22,7 @@ Proyecto de MCDI500 (Programación para la Ciencia de Datos, Magíster en Cienci
 data/raw/        datos originales, sin modificar
 data/processed/  datos tras limpieza y transformación (F2)
 docs/            diccionario, validación, metadatos y bitácora
-src/             módulos reutilizables del proyecto
+src/             módulos reutilizables: carga, transformadores, pipeline y medición
 F1/ F2/ F3/ F4/  cuadernos e informes de cada fase
 validar_dataset.py  validador de dataset del curso
 ```
@@ -38,7 +38,7 @@ Python 3.12 o superior
 
 Si el equipo tiene la variable de entorno `PYTHONPATH` definida, vaciarla antes de instalar: contamina las librerías del `.venv`.
 
-Ejecutar los cuadernos en orden, F1 y luego F2. Cada cuaderno debe localizar la raíz del proyecto aunque Jupyter lo abra en su propia carpeta.
+Ejecutar los cuadernos en orden: F1, F2 y F3. Cada cuaderno debe localizar la raíz del proyecto aunque Jupyter lo abra en su propia carpeta.
 
 ### Dependencias declaradas
 - ipykernel
