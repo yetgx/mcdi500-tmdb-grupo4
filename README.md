@@ -22,7 +22,7 @@ Proyecto de MCDI500 (Programación para la Ciencia de Datos, Magíster en Cienci
 data/raw/        datos originales, sin modificar
 data/processed/  datos tras limpieza y transformación (F2)
 docs/            diccionario, validación, metadatos y bitácora
-src/             módulos reutilizables del proyecto
+src/             módulos reutilizables: carga, transformadores, pipeline y medición
 F1/ F2/ F3/ F4/  cuadernos e informes de cada fase
 validar_dataset.py  validador de dataset del curso
 ```
@@ -38,14 +38,27 @@ Python 3.12 o superior
 
 Si el equipo tiene la variable de entorno `PYTHONPATH` definida, vaciarla antes de instalar: contamina las librerías del `.venv`.
 
-Ejecutar los cuadernos en orden, F1 y luego F2. Cada cuaderno debe localizar la raíz del proyecto aunque Jupyter lo abra en su propia carpeta.
+Ejecutar los cuadernos en orden, F1, F2 y F3, desde `jupyter lab` con el kernel del `.venv` y con *Restart Kernel and Run All Cells*. Las rutas son relativas a la raíz del repositorio y la semilla aleatoria es 42. Cada cuaderno localiza la raíz del proyecto aunque Jupyter lo abra en su propia carpeta.
 
-### Dependencias declaradas
-- ipykernel
-- jupyterlab
-- notebook
-- numpy==2.5.4
-- pandas==3.1.0
+| Cuaderno | Qué hace | Entrada | Salida |
+|---|---|---|---|
+| `F1/movies.ipynb` | Definición del problema, entorno y reconocimiento inicial del dataset (no modifica datos) | `data/raw/movies_raw.csv` | Tablas y gráficos exploratorios |
+| `F2/Fase2-Preparacion-Recomendador.ipynb` | Diagnóstico, limpieza, sopa de metadatos, vectorización y escalado | `data/raw/movies_raw.csv` | Conjunto preparado para F3 |
+| `F3/F3_NucleoAlgoritmico_TMDB.ipynb` | Núcleo algorítmico: clases del pipeline (`src/`), eficiencia y mediciones de tiempo y memoria | `data/raw/movies_raw.csv` | Resultados del pipeline modular y mediciones |
+
+### Dependencias principales
+Todas las versiones están fijadas en `requirements.txt` (generado con `pip freeze`, codificación UTF-8):
+
+| Librería | Versión |
+|---|---|
+| numpy | 2.5.4 |
+| pandas | 3.1.1 |
+| scikit-learn | 1.9.1 |
+| matplotlib | 3.11.2 |
+| seaborn | 0.13.2 |
+| jupyterlab | 4.6.5 |
+| notebook | 7.6.4 |
+| ipykernel | 7.4.0 |
 
 ## Flujo de trabajo en equipo
 - `main` está protegida: los cambios entran por pull request.
