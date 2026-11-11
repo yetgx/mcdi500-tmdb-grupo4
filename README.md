@@ -43,7 +43,7 @@ Ejecutar los cuadernos en orden, F1, F2 y F3, desde `jupyter lab` con el kernel 
 
 | Cuaderno | Qué hace | Entrada | Salida |
 |---|---|---|---|
-| `F1/movies.ipynb` | Definición del problema, entorno y reconocimiento inicial del dataset (no modifica datos) | `data/raw/movies_raw.csv` | Tablas y gráficos exploratorios |
+| `F1/F1_Definicion.ipynb` | Definición del problema, entorno y reconocimiento inicial del dataset (no modifica datos) | `data/raw/movies_raw.csv` | Tablas y gráficos exploratorios |
 | `F2/Fase2-Preparacion-Recomendador.ipynb` | Diagnóstico, limpieza, sopa de metadatos, vectorización y escalado | `data/raw/movies_raw.csv` | Conjunto preparado para F3 |
 | `F3/F3_NucleoAlgoritmico_TMDB.ipynb` | Núcleo algorítmico: clases del pipeline (`src/`), eficiencia y mediciones de tiempo y memoria | `data/raw/movies_raw.csv` | Resultados del pipeline modular y mediciones |
 

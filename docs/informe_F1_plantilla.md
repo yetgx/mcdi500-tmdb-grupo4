@@ -7,7 +7,7 @@
 **Grupo 4:** Daniela Baeza Rocha · Juan González Elgueta · Elías Manríquez Armijo · Yestxander Rada Gutierrez
 **Repositorio:** https://github.com/yetgx/mcdi500-tmdb-grupo4
 
-> Nota: la guía oficial de la Sumativa 1 no está en el repositorio. Esta plantilla sigue la estructura de `F1/movies.ipynb` y los 5 indicadores del cuaderno práctico. Ajustar secciones y extensión al enunciado de Canvas.
+> Nota: la guía oficial de la Sumativa 1 no está en el repositorio. Esta plantilla sigue la estructura de `F1/F1_Definicion.ipynb` y los 5 indicadores del cuaderno práctico. Ajustar secciones y extensión al enunciado de Canvas.
 
 ---
 
