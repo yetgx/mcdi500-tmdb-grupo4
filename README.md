@@ -24,6 +24,7 @@ data/processed/  datos tras limpieza y transformación (F2)
 docs/            diccionario, validación, metadatos y bitácora
 src/             módulos reutilizables: carga, transformadores, pipeline y medición
 F1/ F2/ F3/ F4/  cuadernos e informes de cada fase
+docs/practica/    cuaderno de práctica del curso (referencia, no es un entregable)
 validar_dataset.py  validador de dataset del curso
 ```
 
@@ -60,6 +61,9 @@ Todas las versiones están fijadas en `requirements.txt` (generado con `pip free
 | notebook | 7.6.4 |
 | ipykernel | 7.4.0 |
 
+### Regenerar `data/processed/`
+Al ejecutar `F2/Fase2-Preparacion-Recomendador.ipynb` completo (Pasos 7 y 8) se escriben `data/processed/movies_procesado.csv` (17.978 filas, una película por fila) y `data/processed/movies_bow_matrix.npz` (matriz dispersa del *Bag of Words*, mismo orden de filas). El Paso 7 valida el conjunto con `assert` antes de exportarlo y el Paso 8 verifica la relectura. `data/raw/` nunca se modifica.
+
 ## Flujo de trabajo en equipo
 - `main` está protegida: los cambios entran por pull request.
 - Ramas por tarea: `feat/f2-imputacion`, `docs/bitacora`, `fix/ruta-datos`.
@@ -73,3 +77,6 @@ Prefijos: `docs`, `data`, `feat`, `fix`. Mensaje en imperativo y específico, po
 - Semilla aleatoria fijada en 42 para asegurar reproducibilidad.
 - El archivo original pesa 3.2 MB, por lo que se versiona en `data/raw/`.
 - Registro breve de las decisiones relevantes, con su motivo y cifras, en `docs/bitacora.md`, actualizado al cerrar cada fase.
+
+## Autoría
+Cada integrante tiene más de una identidad de Git en el historial (cambios de nombre de usuario o de equipo). El archivo `.mailmap` las unifica: `git shortlog -sne` muestra una sola línea por persona.
