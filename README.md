@@ -21,10 +21,9 @@ Proyecto de MCDI500 (Programación para la Ciencia de Datos, Magíster en Cienci
 ```
 data/raw/        datos originales, sin modificar
 data/processed/  datos tras limpieza y transformación (F2)
-docs/            diccionario, validación, metadatos y bitácora
+docs/            validación del dataset, informe, bitácora, guías y práctica del curso
 src/             módulos reutilizables: carga, transformadores, pipeline y medición
 F1/ F2/ F3/ F4/  cuadernos e informes de cada fase
-docs/practica/    cuaderno de práctica del curso (referencia, no es un entregable)
 validar_dataset.py  validador de dataset del curso
 ```
 
@@ -70,7 +69,7 @@ Al ejecutar `F2/Fase2-Preparacion-Recomendador.ipynb` completo (Pasos 7 y 8) se 
 - Cada integrante commitea con su propio usuario de Git, desde el primer día y en ambas fases.
 
 ## Convención de commits
-Prefijos: `docs`, `data`, `feat`, `fix`. Mensaje en imperativo y específico, por ejemplo `feat: agrega imputacion de runtime por mediana`.
+Prefijos: `docs`, `data`, `feat`, `fix`, `chore`. Mensaje en imperativo y específico, por ejemplo `feat: agrega imputacion de runtime por mediana`.
 
 ## Decisiones técnicas
 - Los datos son comunes a todas las fases (`data/`); los cuadernos se separan por fase.
