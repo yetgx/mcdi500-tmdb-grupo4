@@ -8,7 +8,7 @@
 - [ ] El/los notebook(s) corren completos con *Restart Kernel and Run All*
 - [ ] Rutas relativas y semilla 42
 - [ ] `data/raw/` sin modificar
-- [ ] Commits con prefijo `docs`, `data`, `feat` o `fix`
+- [ ] Commits con prefijo `docs`, `data`, `feat`, `fix` o `chore`
 - [ ] README o `docs/` actualizados si cambió algo del flujo
 
 ## Aviso al grupo (WhatsApp)
