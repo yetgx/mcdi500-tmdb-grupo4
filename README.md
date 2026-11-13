@@ -35,9 +35,9 @@ validar_dataset.py  validador de dataset del curso
 ```
 
 ## Requisitos y ejecución
-Python 3.12 (fijado en `.python-version`; los cuadernos se ejecutan con 3.12). Si tu `.venv` se creó con otra versión, bórralo y créalo de nuevo.
+Python 3.13.0 exacto (versión que pide la presentación del curso, `MCDI500_Semana_1.pdf`, p. 10; fijada en `.python-version`). Verifica con `python --version` y, si tu `.venv` se creó con otra versión, bórralo y créalo de nuevo.
 
-    python3.12 -m venv .venv         # Windows: py -3.12 -m venv .venv
+    python3.13 -m venv .venv         # Windows: py -3.13 -m venv .venv
     source .venv/Scripts/activate    # Windows, Git Bash
     # .venv\Scripts\Activate.ps1     # Windows, PowerShell
     # source .venv/bin/activate      # macOS y Linux

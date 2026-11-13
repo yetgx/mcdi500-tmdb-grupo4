@@ -1,4 +1,4 @@
-# Dependencias directas del proyecto (Python 3.12). Solo lo que importan los
+# Dependencias directas del proyecto (Python 3.13.0). Solo lo que importan los
 # notebooks, src/ y tests/, más el entorno de Jupyter; sin paquetes propios de
 # un sistema operativo, para que se instale igual en Windows, macOS y Linux.
 # Las dependencias transitivas las resuelve pip.
