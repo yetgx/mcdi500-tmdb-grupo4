@@ -46,6 +46,8 @@ Python 3.12 (fijado en `.python-version`; los cuadernos se ejecutan con 3.12). S
 
 Si el equipo tiene la variable de entorno `PYTHONPATH` definida, vaciarla antes de instalar: contamina las librerías del `.venv`.
 
+En Windows, si `pip` falla con *«This error might have occurred since this system does not have Windows Long Path support enabled»*, la ruta de la carpeta es demasiado larga para JupyterLab (pasa al clonar dentro de OneDrive o de carpetas muy anidadas). Hay dos salidas: clonar en una ruta corta, como `C:\MCDI500\`, o habilitar las rutas largas una vez, desde PowerShell como administrador: `New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name LongPathsEnabled -Value 1 -PropertyType DWORD -Force`.
+
 Ejecutar los cuadernos en orden, F1, F2 y F3, desde `jupyter lab` con el kernel del `.venv` y con *Restart Kernel and Run All Cells*. Las rutas son relativas a la raíz del repositorio y la semilla aleatoria es 42. Cada cuaderno localiza la raíz del proyecto aunque Jupyter lo abra en su propia carpeta.
 
 | Cuaderno | Qué hace | Entrada | Salida |
