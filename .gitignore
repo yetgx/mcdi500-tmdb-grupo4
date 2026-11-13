@@ -21,3 +21,6 @@ desktop.ini
 # Datos pesados y modelos
 *.ckpt
 *.pth
+
+# Pruebas
+.pytest_cache/

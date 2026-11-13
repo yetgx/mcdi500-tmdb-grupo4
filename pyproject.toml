@@ -1,0 +1,9 @@
+[project]
+name = "mcdi500-tmdb-grupo4"
+version = "0.2.0"
+description = "Recomendador de películas TMDB 2010-2025 (MCDI500, Grupo 4)"
+requires-python = "==3.13.0"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

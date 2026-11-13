@@ -1,0 +1,17 @@
+columna,descripcion,uso
+movie_id,Identificador TMDB,identificación
+title,Título de la película,identificación
+release_date,Fecha de estreno (texto ISO),identificación
+genres_clean,Géneros en minúsculas separados por espacio,similitud (vía metadata_soup)
+companies_clean,Hasta 3 productoras sin espacios ni puntuación,similitud (vía metadata_soup)
+lang_clean,Idioma original en minúsculas,similitud (vía metadata_soup)
+metadata_soup,Texto que vectoriza CountVectorizer,similitud
+vote_average,Valoración promedio original (0-10),insumo de weighted_rating
+vote_count,Cantidad de votos original,insumo de weighted_rating
+popularity,Popularidad original de TMDB,insumo de score_popularity_norm
+weighted_rating,Weighted Rating con m = percentil 75 de vote_count,calidad
+score_quality_norm,"weighted_rating escalado a [0, 1]",calidad (ponderación final)
+score_popularity_norm,"log1p(popularity) escalado a [0, 1]",popularidad (ponderación final)
+runtime_clean,Duración en minutos; ceros imputados por mediana del género principal,no la usa el recomendador (contexto)
+budget_clean,"Presupuesto en USD; ceros convertidos a NaN, sin imputar","no la usa el recomendador (69,3 % NaN)"
+revenue_clean,"Recaudación en USD; ceros convertidos a NaN, sin imputar","no la usa el recomendador (62,1 % NaN)"

@@ -1,0 +1,69 @@
+# Verifica en Linux, macOS y Windows que el entorno se instala desde
+# requirements.txt, que las pruebas pasan y que los notebooks corren completos
+# y regeneran el mismo conjunto procesado que está versionado.
+name: Reproducibilidad
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  reproducir:
+    name: ${{ matrix.os }} · Python 3.13.0
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # ubuntu-24.04 y no ubuntu-latest: setup-python no publica Python 3.13.0 para Ubuntu 26.04
+        os: [ubuntu-24.04, macos-latest, windows-latest]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Instalar dependencias en un entorno virtual
+        run: |
+          python -m venv .venv
+          if [ -f .venv/bin/activate ]; then source .venv/bin/activate; else source .venv/Scripts/activate; fi
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip check
+          python --version
+          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> "$GITHUB_ENV"
+          echo "$(dirname "$(command -v python)")" >> "$GITHUB_PATH"
+
+      - name: Pruebas unitarias
+        run: python -m pytest -v
+
+      - name: Ejecutar F1, F2 y F3 completos
+        run: |
+          mkdir -p ejecutados
+          for nb in F1/F1_Definicion.ipynb F2/Fase2-Preparacion-Recomendador.ipynb F3/F3_NucleoAlgoritmico_TMDB.ipynb; do
+            python -m jupyter nbconvert --to notebook --execute "$nb" --output-dir ejecutados \
+              --ExecutePreprocessor.kernel_name=python3 --ExecutePreprocessor.timeout=900
+          done
+
+      - name: El conjunto regenerado coincide con el versionado
+        run: |
+          git show HEAD:data/processed/movies_procesado.csv > versionado.csv
+          git show HEAD:data/processed/movies_bow_matrix.npz > versionado.npz
+          python - <<'EOF'
+          import pandas as pd
+          from scipy import sparse
+          pd.testing.assert_frame_equal(pd.read_csv("data/processed/movies_procesado.csv"), pd.read_csv("versionado.csv"))
+          m, v = sparse.load_npz("data/processed/movies_bow_matrix.npz"), sparse.load_npz("versionado.npz")
+          assert m.shape == v.shape and (m != v).nnz == 0, "la matriz regenerada difiere de la versionada"
+          print(f"OK: conjunto y matriz {m.shape[0]:,} x {m.shape[1]:,} idénticos a los versionados")
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: notebooks-ejecutados-${{ matrix.os }}
+          path: ejecutados/
