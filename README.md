@@ -1,6 +1,10 @@
 # Películas TMDB 2010–2025 — Grupo 4
 
-Proyecto de MCDI500 (Programación para la Ciencia de Datos, Magíster en Ciencia de Datos e Inteligencia Artificial, UNAB). Trabaja con un extracto de The Movie Database (TMDB) con estrenos entre 2010 y 2025: presupuesto, recaudación, duración, géneros, productoras, países, idiomas, valoración y popularidad. La definición del problema y los objetivos se completan en la Fase 1 (`F1/`).
+[![Reproducibilidad](https://github.com/yetgx/mcdi500-tmdb-grupo4/actions/workflows/reproducibilidad.yml/badge.svg)](https://github.com/yetgx/mcdi500-tmdb-grupo4/actions/workflows/reproducibilidad.yml)
+
+Proyecto de MCDI500 (Programación para la Ciencia de Datos, Magíster en Ciencia de Datos e Inteligencia Artificial, UNAB). Trabaja con un extracto de The Movie Database (TMDB) con estrenos entre 2010 y 2025: presupuesto, recaudación, duración, géneros, productoras, países, idiomas, valoración y popularidad. El proyecto construye un recomendador híbrido de películas: similitud de contenido (géneros, productoras e idioma) ponderada por calidad (*Weighted Rating*) y popularidad.
+
+**Pregunta:** ¿en qué medida ese recomendador entrega, para una película dada, recomendaciones coherentes con ella en género e idioma y respaldadas por un volumen suficiente de votos? Se evalúa con tres proporciones sobre las 10 recomendaciones de cada película (comparte género, mismo idioma, votos ≥ percentil 75) frente a una línea base al azar: 41,8 %, 36,6 % y 25,0 % (`F1/F1_Definicion.ipynb`, sección 3).
 
 ## Integrantes
 - Yestxander Rada (@yetgx)
@@ -20,21 +24,25 @@ Proyecto de MCDI500 (Programación para la Ciencia de Datos, Magíster en Cienci
 ## Estructura del repositorio
 ```
 data/raw/        datos originales, sin modificar
-data/processed/  datos tras limpieza y transformación (F2)
-docs/            validación del dataset, informe, bitácora, guías y práctica del curso
-src/             módulos reutilizables: carga, transformadores, pipeline y medición
+data/processed/  datos tras limpieza y transformación (F2) y su diccionario
+docs/            validación del dataset, informe, mapa, bitácora y guía de subida
+docs/evaluaciones/  rúbricas y retroalimentación recibidas, para preparar las próximas entregas
+src/             módulos reutilizables: preparación (F2), carga, transformadores, pipeline y medición
+tests/           pruebas unitarias de src/ (pytest)
 F1/ F2/ F3/ F4/  cuadernos e informes de cada fase
+.github/workflows/  verificación en Ubuntu, macOS y Windows en cada PR
 validar_dataset.py  validador de dataset del curso
 ```
 
 ## Requisitos y ejecución
-Python 3.12 o superior
+Python 3.12 (fijado en `.python-version`; los cuadernos se ejecutan con 3.12). Si tu `.venv` se creó con otra versión, bórralo y créalo de nuevo.
 
-    python -m venv .venv
+    python3.12 -m venv .venv         # Windows: py -3.12 -m venv .venv
     source .venv/Scripts/activate    # Windows, Git Bash
     # .venv\Scripts\Activate.ps1     # Windows, PowerShell
     # source .venv/bin/activate      # macOS y Linux
     python -m pip install -r requirements.txt
+    python -m pytest                 # pruebas de src/
 
 Si el equipo tiene la variable de entorno `PYTHONPATH` definida, vaciarla antes de instalar: contamina las librerías del `.venv`.
 
@@ -42,12 +50,12 @@ Ejecutar los cuadernos en orden, F1, F2 y F3, desde `jupyter lab` con el kernel 
 
 | Cuaderno | Qué hace | Entrada | Salida |
 |---|---|---|---|
-| `F1/F1_Definicion.ipynb` | Definición del problema, entorno y reconocimiento inicial del dataset (no modifica datos) | `data/raw/movies_raw.csv` | Tablas y gráficos exploratorios |
-| `F2/Fase2-Preparacion-Recomendador.ipynb` | Diagnóstico, limpieza, sopa de metadatos, vectorización y escalado | `data/raw/movies_raw.csv` | Conjunto preparado para F3 |
+| `F1/F1_Definicion.ipynb` | Definición del problema y del criterio de evaluación, entorno, reconocimiento inicial del dataset, línea base y vínculo con el mapa (no modifica datos) | `data/raw/movies_raw.csv` | Tablas y gráficos exploratorios |
+| `F2/Fase2-Preparacion-Recomendador.ipynb` | Diagnóstico, limpieza, sopa de metadatos, vectorización y escalado, con las funciones de `src/preparacion.py` | `data/raw/movies_raw.csv` | Conjunto preparado para F3 |
 | `F3/F3_NucleoAlgoritmico_TMDB.ipynb` | Núcleo algorítmico: clases del pipeline (`src/`), eficiencia y mediciones de tiempo y memoria | `data/raw/movies_raw.csv` | Resultados del pipeline modular y mediciones |
 
-### Dependencias principales
-Todas las versiones están fijadas en `requirements.txt` (generado con `pip freeze`, codificación UTF-8):
+### Dependencias
+`requirements.txt` contiene solo las dependencias directas, con versión exacta y sin paquetes propios de un sistema operativo; pip resuelve el resto. El flujo de GitHub Actions comprueba en cada PR que se instala y que los cuadernos corren en Ubuntu, macOS y Windows.
 
 | Librería | Versión |
 |---|---|
@@ -55,13 +63,15 @@ Todas las versiones están fijadas en `requirements.txt` (generado con `pip free
 | pandas | 3.1.1 |
 | scikit-learn | 1.9.1 |
 | matplotlib | 3.11.2 |
+| scipy | 1.18.1 |
 | seaborn | 0.13.2 |
 | jupyterlab | 4.6.5 |
-| notebook | 7.6.4 |
 | ipykernel | 7.4.0 |
+| nbconvert | 7.17.2 |
+| pytest | 9.2.0 |
 
 ### Regenerar `data/processed/`
-Al ejecutar `F2/Fase2-Preparacion-Recomendador.ipynb` completo (Pasos 7 y 8) se escriben `data/processed/movies_procesado.csv` (17.978 filas, una película por fila) y `data/processed/movies_bow_matrix.npz` (matriz dispersa del *Bag of Words*, mismo orden de filas). El Paso 7 valida el conjunto con `assert` antes de exportarlo y el Paso 8 verifica la relectura. `data/raw/` nunca se modifica.
+Al ejecutar `F2/Fase2-Preparacion-Recomendador.ipynb` completo (Pasos 7 y 8) se escriben `data/processed/movies_procesado.csv` (17.978 filas, una película por fila), `data/processed/movies_procesado_diccionario.csv` (uso de cada columna; `runtime_clean`, `budget_clean` y `revenue_clean` no las usa el recomendador) y `data/processed/movies_bow_matrix.npz` (matriz dispersa del *Bag of Words*, mismo orden de filas). El Paso 7 valida el conjunto con `assert` antes de exportarlo y el Paso 8 verifica la relectura. `data/raw/` nunca se modifica.
 
 ## Flujo de trabajo en equipo
 - `main` está protegida: los cambios entran por pull request.
