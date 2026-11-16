@@ -55,6 +55,11 @@ def cargar(ruta, columnas_esperadas, columnas_numericas=()):
     # convertiría en columna de objetos sin ningún aviso
     for columna in columnas_numericas:
         if columna in df.columns:
-            df[columna] = pd.to_numeric(df[columna], errors="coerce")
+            original = df[columna]
+            convertida = pd.to_numeric(original, errors="coerce")
+            nuevos_nulos = int((original.notna() & convertida.isna()).sum())
+            if nuevos_nulos:
+                raise ValueError(f"{columna}: {nuevos_nulos} valores no numéricos; casting rechazado para evitar pérdida silenciosa")
+            df[columna] = convertida
     verificar_esquema(df, columnas_esperadas)
     return df

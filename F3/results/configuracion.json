@@ -1,0 +1,45 @@
+{
+  "semilla": 42,
+  "n_train": 14382,
+  "n_test": 3596,
+  "pasos": [
+    {
+      "nombre": "ConstructorSopa(metadata_soup)",
+      "parametros": {
+        "origen": {
+          "genero": "genres",
+          "productoras": "production_companies",
+          "idioma": "original_language"
+        },
+        "max_productoras": 3
+      }
+    },
+    {
+      "nombre": "LogNaturalPlus1(popularity)",
+      "parametros": {
+        "minimo": 0.0079
+      }
+    },
+    {
+      "nombre": "EscaladorMinMax(popularity)",
+      "parametros": {
+        "minimo": 0.00786895837869518,
+        "rango": 4.644749539516677
+      }
+    },
+    {
+      "nombre": "EscaladorMinMax(vote_average)",
+      "parametros": {
+        "minimo": 1.832,
+        "rango": 8.068
+      }
+    },
+    {
+      "nombre": "EscaladorMinMax(vote_count)",
+      "parametros": {
+        "minimo": 50.0,
+        "rango": 38764.0
+      }
+    }
+  ]
+}
