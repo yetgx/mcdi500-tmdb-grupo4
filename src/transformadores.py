@@ -5,7 +5,6 @@ Lo usa el cuaderno F3/F3_NucleoAlgoritmico_TMDB.ipynb.
 """
 
 import numpy as np
-import pandas as pd
 
 
 class Transformador:
@@ -52,10 +51,7 @@ class Transformador:
 
         # 2) Delegar el cálculo a la clase hija. La base no sabe QUÉ se aprende;
         #    solo sabe CUÁNDO hay que aprenderlo.
-        parametros = self.aprender(df)
-        if not isinstance(parametros, dict):
-            raise TypeError(f"{self.nombre}: aprender() debe devolver dict")
-        self._parametros = parametros
+        self._parametros = self.aprender(df)
 
         # 3) Registrar que ya se ajustó, para poder controlarlo después
         self._ajustado = True
@@ -100,10 +96,6 @@ class ImputadorMediana(Transformador):
     """
 
     def aprender(self, df):
-        if not pd.api.types.is_numeric_dtype(df[self.columna]):
-            raise TypeError(f"{self.nombre}: se requiere columna numérica")
-        if df[self.columna].notna().sum() == 0:
-            raise ValueError(f"{self.nombre}: no existen valores válidos para aprender mediana")
         return {"mediana": float(df[self.columna].median()),
                 "nulos_en_ajuste": int(df[self.columna].isna().sum())}
 
@@ -170,10 +162,7 @@ class LogNaturalPlus1(Transformador):
     """
 
     def aprender(self, df):
-        valores = pd.to_numeric(df[self.columna], errors="raise")
-        if valores.empty or not np.isfinite(valores.to_numpy(dtype=float)).all() or (valores < 0).any():
-            raise ValueError(f"{self.nombre}: log1p exige valores finitos no negativos")
-        return {"minimo": float(valores.min())}
+        return {"minimo": float(df[self.columna].min())}
 
     def aplicar(self, df):
         if (df[self.columna] < 0).any():
@@ -186,10 +175,7 @@ class EscaladorMinMax(Transformador):
     """Lleva la columna al rango [0, 1] con el mínimo y el máximo del ajuste."""
 
     def aprender(self, df):
-        valores = pd.to_numeric(df[self.columna], errors="raise")
-        if valores.empty or not np.isfinite(valores.to_numpy(dtype=float)).all():
-            raise ValueError(f"{self.nombre}: datos vacíos o no finitos")
-        minimo, maximo = float(valores.min()), float(valores.max())
+        minimo, maximo = float(df[self.columna].min()), float(df[self.columna].max())
         return {"minimo": minimo, "rango": (maximo - minimo) or 1.0}
 
     def aplicar(self, df):
@@ -210,8 +196,6 @@ class ConstructorSopa(Transformador):
                  max_productoras=3):
         super().__init__(columna)
         self._origen = {"genero": genero, "productoras": productoras, "idioma": idioma}
-        if not isinstance(max_productoras, int) or max_productoras < 1:
-            raise ValueError("max_productoras debe ser entero >= 1")
         self._max_productoras = max_productoras
 
     def ajustar(self, df):
@@ -227,9 +211,6 @@ class ConstructorSopa(Transformador):
         return {"origen": dict(self._origen), "max_productoras": self._max_productoras}
 
     def aplicar(self, df):
-        for origen in self._origen.values():
-            if df[origen].dropna().map(lambda x: not isinstance(x, str)).any():
-                raise TypeError(f"{self.nombre}: {origen} debe contener texto o nulos")
         genero = df[self._origen["genero"]].fillna("").str.replace("|", " ", regex=False).str.lower()
         productoras = df[self._origen["productoras"]].fillna("").map(
             lambda t: " ".join(p.replace(" ", "").lower()

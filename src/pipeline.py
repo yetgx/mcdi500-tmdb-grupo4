@@ -26,13 +26,9 @@ class Pipeline:
 
     def ajustar(self, df):
         """Aprende los parámetros de cada paso SOLO con estos datos."""
-        import copy
-        # Ajuste transaccional: si falla un paso, el pipeline original permanece sin ajustar.
-        candidatos = copy.deepcopy(self._pasos)
         intermedio = df.copy()
-        for paso in candidatos:
+        for paso in self._pasos:
             intermedio = paso.ajustar_transformar(intermedio)
-        self._pasos = candidatos
         self._ajustado = True
         return self
 
