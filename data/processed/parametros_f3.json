@@ -2,6 +2,39 @@
   "semilla": 42,
   "fraccion_prueba": 0.2,
   "pasos": {
+    "DuracionPorGenero(runtime)": {
+      "medianas": {
+        "Action": 103.0,
+        "Adventure": 100.0,
+        "Animation": 84.0,
+        "Comedy": 97.0,
+        "Crime": 107.0,
+        "Documentary": 92.0,
+        "Drama": 105.0,
+        "Family": 90.0,
+        "Fantasy": 100.0,
+        "History": 120.0,
+        "Horror": 92.0,
+        "Music": 104.0,
+        "Mystery": 99.0,
+        "Romance": 100.0,
+        "Science Fiction": 97.0,
+        "TV Movie": 85.0,
+        "Thriller": 98.0,
+        "Unknown": 12.5,
+        "War": 112.0,
+        "Western": 103.0
+      },
+      "global": 98.0
+    },
+    "CerosComoAusentes(budget)": {
+      "ceros_en_ajuste": 9995,
+      "destino": "budget_clean"
+    },
+    "CerosComoAusentes(revenue)": {
+      "ceros_en_ajuste": 8925,
+      "destino": "revenue_clean"
+    },
     "ConstructorSopa(metadata_soup)": {
       "origen": {
         "genero": "genres",
@@ -10,20 +43,24 @@
       },
       "max_productoras": 3
     },
+    "CalidadPonderada(vote_average)": {
+      "C": 6.327036782088722,
+      "m": 421.0,
+      "percentil": 0.75
+    },
     "LogNaturalPlus1(popularity)": {
-      "minimo": 0.0079
+      "minimo": 0.0079,
+      "destino": "popularity_log"
     },
-    "EscaladorMinMax(vote_average)": {
-      "minimo": 1.832,
-      "rango": 8.068
+    "EscaladorMinMax(weighted_rating)": {
+      "minimo": 4.39459985209556,
+      "rango": 4.0173302633175965,
+      "destino": "score_quality_norm"
     },
-    "EscaladorMinMax(vote_count)": {
-      "minimo": 50.0,
-      "rango": 38764.0
-    },
-    "EscaladorMinMax(popularity)": {
+    "EscaladorMinMax(popularity_log)": {
       "minimo": 0.00786895837869518,
-      "rango": 4.644749539516677
+      "rango": 4.644749539516677,
+      "destino": "score_popularity_norm"
     }
   }
 }
