@@ -62,5 +62,15 @@
       "rango": 4.644749539516677,
       "destino": "score_popularity_norm"
     }
+  },
+  "recomendador": {
+    "pesos": {
+      "similitud": 0.5,
+      "calidad": 0.5,
+      "popularidad": 0.0
+    },
+    "n": 10,
+    "regla_de_eleccion": "maximiza el peor de los tres criterios en 2.000 películas de entrenamiento",
+    "vocabulario": 12041
   }
 }
