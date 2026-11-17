@@ -172,6 +172,21 @@ def construir_sopa(genres_clean, companies_clean, lang_clean):
     return (genres_clean + " " + companies_clean + " " + lang_clean).str.replace(r"\s+", " ", regex=True).str.strip()
 
 
+
+def construir_sopa_por_fila(df, max_productoras=MAX_PRODUCTORAS):
+    """La misma sopa que construir_sopa, armada fila por fila con iterrows.
+
+    No la usa el pipeline: existe para medir la eficiencia frente a la versión
+    por columnas (cuaderno F3, sección 7), con las mismas reglas de limpieza.
+    """
+    metadatos, filas = imputar_metadatos(df), []
+    for _, fila in metadatos.iterrows():
+        partes = (f"{clean_genres(fila['genres'])} "
+                  f"{clean_text_feature(fila['production_companies'], max_productoras)} "
+                  f"{fila['original_language'].lower()}")
+        filas.append(" ".join(partes.split()))
+    return pd.Series(filas, index=df.index, name="metadata_soup")
+
 # ---- Calidad ponderada -------------------------------------------------------------
 
 def calculate_weighted_rating(v, R, m, C):
