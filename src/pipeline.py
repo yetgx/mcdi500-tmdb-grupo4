@@ -6,7 +6,9 @@ Lo usa el cuaderno F3/F3_NucleoAlgoritmico_TMDB.ipynb.
 
 import pandas as pd
 
-from .transformadores import Transformador
+from .preparacion import diccionario_procesado
+from .transformadores import (CalidadPonderada, CerosComoAusentes, ConstructorSopa, DuracionPorGenero,
+                              EscaladorMinMax, LogNaturalPlus1, Transformador)
 
 
 class Pipeline:
@@ -56,3 +58,30 @@ class Pipeline:
     def __repr__(self):
         estado = "ajustado" if self._ajustado else "sin ajustar"
         return f"Pipeline({len(self._pasos)} pasos, {estado})"
+
+
+# ---- Pipeline del proyecto TMDB ----------------------------------------------------
+
+def pipeline_tmdb():
+    """Los 8 pasos de la Fase 2, en orden, como transformadores sin ajustar."""
+    return Pipeline([
+        DuracionPorGenero(),                                       # runtime_clean
+        CerosComoAusentes("budget", "budget_clean"),
+        CerosComoAusentes("revenue", "revenue_clean"),
+        ConstructorSopa(),                                         # genres/companies/lang_clean y metadata_soup
+        CalidadPonderada(),                                        # weighted_rating (aprende C y m)
+        LogNaturalPlus1("popularity", "popularity_log"),
+        EscaladorMinMax("weighted_rating", "score_quality_norm"),
+        EscaladorMinMax("popularity_log", "score_popularity_norm"),
+    ])
+
+
+def ejecutar(datos, ajustar_con=None):
+    """Prepara el conjunto con una sola llamada y devuelve las columnas de F2, en su orden.
+
+    Los parámetros se aprenden con `ajustar_con` (por defecto, los mismos
+    datos, como hizo F2 sobre el catálogo completo) y se aplican a `datos`.
+    """
+    columnas = diccionario_procesado()["columna"].tolist()
+    pipe = pipeline_tmdb().ajustar(datos if ajustar_con is None else ajustar_con)
+    return pipe.transformar(datos)[columnas].reset_index(drop=True)
