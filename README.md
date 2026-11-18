@@ -26,9 +26,11 @@ Proyecto de MCDI500 (Programación para la Ciencia de Datos, Magíster en Cienci
 data/raw/        datos originales, sin modificar
 data/processed/  datos tras limpieza y transformación (F2) y su diccionario
 docs/            validación del dataset, informe, mapa, bitácora y guía de subida
-docs/evaluaciones/  rúbricas y retroalimentación recibidas, para preparar las próximas entregas
-src/             módulos reutilizables: preparación (F2), carga, transformadores, pipeline y medición
-tests/           pruebas unitarias de src/ (pytest)
+docs/evaluaciones/  rúbricas, retroalimentación y guías del docente (Sumativa 2: guia_sumativa2_fase3.md)
+src/             módulos reutilizables: preparación (F2), carga, transformadores, pipeline (ejecutar),
+                 recomendador, recursividad y medición
+tests/           pruebas unitarias de src/ (pytest, un archivo por módulo)
+F3/results/      evaluación del recomendador, rejilla de pesos y mediciones de eficiencia
 F1/ F2/ F3/ F4/  cuadernos e informes de cada fase
 .github/workflows/  verificación en Ubuntu, macOS y Windows en cada PR
 validar_dataset.py  validador de dataset del curso
@@ -54,7 +56,7 @@ Ejecutar los cuadernos en orden, F1, F2 y F3, desde `jupyter lab` con el kernel 
 |---|---|---|---|
 | `F1/F1_Definicion.ipynb` | Definición del problema y del criterio de evaluación, entorno, reconocimiento inicial del dataset, línea base y vínculo con el mapa (no modifica datos) | `data/raw/movies_raw.csv` | Tablas y gráficos exploratorios |
 | `F2/Fase2-Preparacion-Recomendador.ipynb` | Diagnóstico, limpieza, sopa de metadatos, vectorización y escalado, con las funciones de `src/preparacion.py` | `data/raw/movies_raw.csv` | Conjunto preparado para F3 |
-| `F3/F3_NucleoAlgoritmico_TMDB.ipynb` | Núcleo algorítmico: clases del pipeline (`src/`), eficiencia y mediciones de tiempo y memoria | `data/raw/movies_raw.csv` | Resultados del pipeline modular y mediciones |
+| `F3/F3_NucleoAlgoritmico_TMDB.ipynb` | Núcleo algorítmico: pipeline de clases con `ejecutar()` y equivalencia exacta con F2, recomendador híbrido (coseno + *Weighted Rating*) evaluado frente a la línea base de F1, recursividad frente a iteración y mediciones de tiempo y memoria | `data/raw/movies_raw.csv` y `data/processed/movies_procesado.csv` | `data/processed/*_f3.*` y `F3/results/` |
 
 ### Dependencias
 `requirements.txt` contiene solo las dependencias directas, con versión exacta y sin paquetes propios de un sistema operativo; pip resuelve el resto. El flujo de GitHub Actions comprueba en cada PR que se instala y que los cuadernos corren en Ubuntu, macOS y Windows.

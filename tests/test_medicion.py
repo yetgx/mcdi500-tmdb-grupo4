@@ -28,3 +28,16 @@ def test_escalabilidad_y_tiempo_minimo():
     assert resultado == 6 and segundos >= 0
     with pytest.raises(ValueError):
         tiempo_minimo(sum, [1], repeticiones=0)
+
+
+def test_medir_detiene_tracemalloc_si_la_funcion_falla():
+    import tracemalloc
+
+    from src.medicion import medir
+
+    def falla(_):
+        raise ZeroDivisionError("error de la función medida")
+
+    with pytest.raises(ZeroDivisionError):
+        medir(falla, None)
+    assert not tracemalloc.is_tracing()
