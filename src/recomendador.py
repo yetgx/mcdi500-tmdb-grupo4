@@ -9,8 +9,10 @@ Para una película consultada i y cada película j del catálogo:
 con w_s + w_c + w_p = 1. El coseno compara las sopas de metadatos (géneros,
 productoras e idioma) vectorizadas con CountVectorizer; la calidad es el
 Weighted Rating escalado y la popularidad es log1p(popularity) escalada, ambas
-de la Fase 2. Las tres van en [0, 1], así que los pesos se leen como la
-importancia relativa de cada componente.
+de la Fase 2. El coseno va en [0, 1] y la calidad y la popularidad también, en
+entrenamiento: al aplicar a prueba el mínimo y el rango aprendidos allí pueden
+salirse un poco (la calidad llega a -0,023 y 1,012), y no se recorta. Los pesos
+se leen como la importancia relativa de cada componente.
 """
 
 from collections import Counter
@@ -117,6 +119,12 @@ class RecomendadorHibrido:
         Procesa por bloques para no materializar la matriz completa de
         similitudes: 500 consultas × 17.978 películas son ~72 MB en float64.
         """
+        self._exigir_ajuste()
+        if len(self._catalogo) <= self._n:
+            raise ValueError(
+                f"RecomendadorHibrido: el catálogo tiene {len(self._catalogo)} películas y n = {self._n}; "
+                "se necesitan más de n para recomendar n sin incluir la consultada."
+            )
         posiciones = np.atleast_1d(np.asarray(posiciones, dtype=np.int64))
         resultado = np.empty((len(posiciones), self._n), dtype=np.int64)
         for inicio in range(0, len(posiciones), bloque):

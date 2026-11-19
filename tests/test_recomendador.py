@@ -57,6 +57,15 @@ def test_vocabulario_de_entrenamiento_ignora_tokens_nuevos(catalogo):
     np.testing.assert_allclose(bucle, (base.vectorizador.transform(["drama horror"]) @ r.matriz.T).toarray()[0])
 
 
+def test_catalogo_con_n_o_menos_peliculas(catalogo):
+    # con 5 películas no hay 5 distintas de la consultada, ni 10: antes devolvía la propia película o fallaba al asignar
+    for n in (5, 10):
+        with pytest.raises(ValueError, match="más de n"):
+            RecomendadorHibrido(n=n).ajustar(catalogo).recomendar(1)
+    tabla = RecomendadorHibrido(n=4).ajustar(catalogo).recomendar(1)
+    assert sorted(tabla["movie_id"]) == [2, 3, 4, 5]   # con n = 4 sí: las otras cuatro
+
+
 @pytest.mark.parametrize("pesos", [(0.5, 0.5, 0.5), (1.2, -0.2, 0.0)])
 def test_pesos_invalidos(pesos):
     with pytest.raises(ValueError, match="pesos"):

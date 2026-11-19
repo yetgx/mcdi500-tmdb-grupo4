@@ -46,7 +46,7 @@ class Transformador:
     @property
     def nombre(self):
         # type(self).__name__ devuelve el nombre de la clase REAL del objeto,
-        # así que un ImputadorMediana se identifica como tal y no como Transformador
+        # así que una CalidadPonderada se identifica como tal y no como Transformador
         return f"{type(self).__name__}({self.columna})"
 
     @property
@@ -111,73 +111,6 @@ class Transformador:
     def aplicar(self, df):
         """Aplica la transformación. Lo implementa cada clase hija."""
         raise NotImplementedError("Cada clase hija debe implementar aplicar().")
-
-
-class ImputadorMediana(Transformador):
-    """Rellena los nulos con la mediana aprendida.
-
-    El paréntesis (Transformador) es la HERENCIA: esta clase recibe todo lo
-    que tiene Transformador sin volver a escribirlo. Solo implementa los dos
-    métodos que le faltaban.
-    """
-
-    def aprender(self, df):
-        return {"mediana": float(df[self.columna].median()),
-                "nulos_en_ajuste": int(df[self.columna].isna().sum())}
-
-    def aplicar(self, df):
-        df[self.columna] = df[self.columna].fillna(self._parametros["mediana"])
-        return df
-
-
-class CodificadorNominal(Transformador):
-    """Convierte una columna de categorías en columnas 0/1.
-
-    El vocabulario se aprende en el ajuste: una categoría que solo aparece en
-    prueba no genera columna nueva, porque el modelo no pudo aprender de ella.
-    """
-
-    def aprender(self, df):
-        # Se guarda la lista de categorías ORDENADA, para que el resultado sea
-        # el mismo en cada ejecución. Sin sorted(), el orden podría variar.
-        return {"categorias": sorted(df[self.columna].dropna().unique())}
-
-    def aplicar(self, df):
-        # Se recorre el vocabulario aprendido, NO las categorías de este df.
-        # Por eso una categoría nueva en prueba no genera columna: el modelo
-        # nunca la vio y no podría haber aprendido nada de ella.
-        for categoria in self._parametros["categorias"]:
-            # Los nombres de columna no deben llevar espacios ni guiones
-            etiqueta = str(categoria).strip().replace(" ", "_").replace("-", "_")
-            # La comparación devuelve True/False; astype(int) lo pasa a 1/0
-            df[f"{self.columna}_{etiqueta}"] = (df[self.columna] == categoria).astype(int)
-
-        # La columna original ya no aporta: su información quedó en las nuevas
-        return df.drop(columns=[self.columna])
-
-
-class EscaladorEstandar(Transformador):
-    """Centra en cero y escala a desviación uno."""
-
-    def aprender(self, df):
-        desviacion = float(df[self.columna].std())
-        return {"media": float(df[self.columna].mean()),
-                "desviacion": desviacion if desviacion != 0 else 1.0}
-
-    def aplicar(self, df):
-        df[self.columna] = ((df[self.columna] - self._parametros["media"])
-                            / self._parametros["desviacion"])
-        return df
-
-
-class EliminadorColumnas(Transformador):
-    """Quita columnas que no aportan al análisis, como el identificador."""
-
-    def aprender(self, df):
-        return {"existe": self.columna in df.columns}
-
-    def aplicar(self, df):
-        return df.drop(columns=[self.columna]) if self.columna in df.columns else df
 
 
 class LogNaturalPlus1(Transformador):

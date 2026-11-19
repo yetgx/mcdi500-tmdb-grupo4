@@ -10,7 +10,11 @@ import pandas as pd
 
 
 def leer_archivo(ruta):
-    """Lee el archivo según su extensión y devuelve un DataFrame."""
+    """Lee el archivo según su extensión y devuelve un DataFrame.
+
+    El proyecto solo lee CSV (movies_raw.csv). Excel y Parquet requieren openpyxl
+    o pyarrow, que no están en requirements.txt porque el código no los usa.
+    """
     extension = os.path.splitext(ruta)[1].lower()
 
     if extension in (".csv", ".txt"):
