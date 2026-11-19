@@ -24,3 +24,6 @@ desktop.ini
 
 # Pruebas
 .pytest_cache/
+
+# Datos externos de apoyo (p. ej. calificaciones de IMDb): no se versionan, su licencia es distinta a la del conjunto del proyecto
+data/external/
