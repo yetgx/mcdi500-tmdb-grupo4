@@ -1,0 +1,3 @@
+figura,hallazgo,evidencia
+p05_votos_popularidad,La asociación entre votos y popularidad varía según el idioma,"Idioma inglés: ρ=0,751 (n=10.615); Otros idiomas conocidos: ρ=0,378 (n=7.355); idioma no informado fuera de la figura: 8. Asociación descriptiva, no causal."
+p06_umbral_respaldo_votos,El corte de respaldo de votos deja fuera a la mayoría del catálogo,"P75 del catálogo: 427,75 votos. 4.495 de 17.978 películas (25,0 %) alcanzan al menos 428 votos. No es el parámetro m del Weighted Rating, estimado con entrenamiento."

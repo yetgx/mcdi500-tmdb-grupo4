@@ -7,7 +7,10 @@ import pandas as pd
 import pytest
 from PIL import Image
 
-from src.f4_puntos_5_7 import _es, analizar_asociacion, cargar_contrato, controles_tecnicos, persistir
+from src.f4_puntos_5_7 import (
+    _es, analizar_asociacion, cargar_contrato, controles_tecnicos, figura_asociacion_votos,
+    figura_umbral_votos, persistir, persistir_apoyo,
+)
 
 BASE = Path(__file__).resolve().parents[1]
 
@@ -84,3 +87,39 @@ def test_cifras_con_formato_es_cl(entradas):
     detalles = controles_tecnicos(*entradas)["detalle"].astype(str)
     assert not detalles.str.contains(r"\.\d{4,}").any()
     assert detalles.str.contains("14.382 + 3.596", regex=False).any()
+
+
+def test_apoyo_grafico_versionado_y_separado(tmp_path, entradas, monkeypatch):
+    monkeypatch.setenv("MPLBACKEND", "Agg")
+    from matplotlib import pyplot as plt
+    plt.switch_backend("Agg")
+
+    catalogo = pd.concat(entradas[:2], ignore_index=True)
+    figura_asociacion, asociacion = figura_asociacion_votos(catalogo)
+    figura_umbral, umbral = figura_umbral_votos(entradas[-1])
+    try:
+        assert {"0,751", "10.615", "0,378", "7.355"} <= set(
+            asociacion["evidencia"].replace("ρ=", "").replace("(n=", "").replace(")", "")
+            .replace(";", "").split()
+        )
+        assert "427,75" in umbral["evidencia"] and "4.495 de 17.978" in umbral["evidencia"]
+        assert figura_asociacion.axes[0].get_xlim() == figura_asociacion.axes[1].get_xlim()
+        assert figura_asociacion.axes[0].collections[0].norm is figura_asociacion.axes[1].collections[0].norm
+        controles = controles_tecnicos(*entradas)
+        registro = [(figura_asociacion, asociacion), (figura_umbral, umbral)]
+        with pytest.raises(ValueError, match="controles"):
+            persistir_apoyo(tmp_path, registro, controles.assign(estado="FALLA"))
+        assert not list(tmp_path.iterdir())
+        (tmp_path / "docs").mkdir()
+        principal = tmp_path / "docs/hallazgos_f4.csv"
+        principal.write_text("registro grupal")
+        rutas = persistir_apoyo(tmp_path, registro, controles)
+        for ruta in rutas[:-1]:
+            with Image.open(tmp_path / ruta) as imagen:
+                assert imagen.format == "PNG"
+                assert imagen.info["dpi"] == pytest.approx((200, 200), abs=0.02)
+        assert pd.read_csv(tmp_path / rutas[-1])["figura"].tolist() == [asociacion["figura"], umbral["figura"]]
+        assert principal.read_text() == "registro grupal"
+    finally:
+        plt.close(figura_asociacion)
+        plt.close(figura_umbral)
