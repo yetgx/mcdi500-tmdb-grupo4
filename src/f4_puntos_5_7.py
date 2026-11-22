@@ -302,3 +302,92 @@ def persistir_apoyo(raiz, figuras_con_hallazgos, controles):
     csv = carpeta / "hallazgos_apoyo.csv"
     tabla.to_csv(csv, index=False)
     return [*rutas, csv.relative_to(raiz).as_posix()]
+
+
+# ---- Capítulo 8: mismo protocolo de evaluación que F3 -------------------------------
+
+METRICAS = {
+    "Género compartido": "genero_compartido",
+    "Idioma coincidente": "idioma_coincidente",
+    "Votos sobre P75": "votos_p75",
+}
+
+
+def preparar_evaluacion(raiz):
+    """Catálogo, recomendador y atributos originales con el protocolo de F3 (sección 6).
+
+    Catálogo = entrenamiento + prueba, en ese orden; vocabulario aprendido en
+    entrenamiento; consultas = posiciones de prueba; pesos de parametros_f3.json.
+    Género, idioma y votos salen del CSV original, unidos por movie_id.
+    """
+    from .recomendador import RecomendadorHibrido
+    from .recursividad import top_k_vectorizado
+
+    entrenamiento, prueba, _, parametros, _ = cargar_contrato(raiz)
+    catalogo = pd.concat([entrenamiento, prueba], ignore_index=True)
+    original = pd.read_csv(Path(raiz) / ENTRADAS["original"],
+                           usecols=["movie_id", "title", "genres", "original_language", "vote_count"])
+    vis = catalogo[["movie_id"]].merge(original, on="movie_id", how="left", validate="one_to_one",
+                                       indicator=True)
+    if not vis["_merge"].eq("both").all():
+        raise ValueError("Hay películas del catálogo F3 que no están en el CSV original.")
+    vis = vis.drop(columns="_merge")
+
+    pesos = parametros["recomendador"]["pesos"]
+    top_k = int(parametros["recomendador"]["n"])
+    vocabulario = RecomendadorHibrido().ajustar(entrenamiento).vectorizador
+    recomendador = RecomendadorHibrido(pesos["similitud"], pesos["calidad"], pesos["popularidad"],
+                                       n=top_k).ajustar(catalogo, vectorizador=vocabulario)
+
+    def puntajes_consulta(q):
+        """Coseno de la película q contra todo el catálogo."""
+        return recomendador.similitudes([q])[0]
+
+    def top_k_por_score(puntajes, q):
+        """Las TOP_K posiciones de mayor puntaje, sin la consultada; mismo selector que F3."""
+        puntajes = np.array(puntajes, dtype=float, copy=True)
+        puntajes[q] = -np.inf
+        return top_k_vectorizado(puntajes, top_k)
+
+    return {
+        "vis": vis,
+        "test_f3": prueba,
+        "recomendador": recomendador,
+        "PESOS": dict(pesos),
+        "GEN": vis["genres"].fillna("").str.split("|").map(lambda g: {x for x in g if x}).to_numpy(),
+        "IDI": vis["original_language"].to_numpy(dtype=object),
+        "VOTOS": vis["vote_count"].to_numpy(dtype=float),
+        "P75": float(original["vote_count"].quantile(0.75)),
+        "CALIDAD": catalogo["score_quality_norm"].to_numpy(dtype=float),
+        "POPULARIDAD": catalogo["score_popularity_norm"].to_numpy(dtype=float),
+        "N_CATALOGO": len(catalogo),
+        "TOP_K": top_k,
+        "CONSULTAS_TEST": np.arange(len(entrenamiento), len(catalogo)),
+        "puntajes_consulta": puntajes_consulta,
+        "top_k_por_score": top_k_por_score,
+        "METRICAS": dict(METRICAS),
+    }
+
+
+def verificar_contra_f3(prep, raiz):
+    """Recalcula solo similitud e híbrido con las funciones del capítulo 8 y los compara con el CSV de F3."""
+    from .recomendador import evaluar_recomendaciones
+
+    f3 = pd.read_csv(Path(raiz) / "F3/results/evaluacion_recomendador.csv", index_col=0)
+    pesos = prep["PESOS"]
+    consultas = prep["CONSULTAS_TEST"]
+    estrategias = {
+        "Solo similitud": lambda s: s,
+        "Híbrido (pesos elegidos)": lambda s: (pesos["similitud"] * s + pesos["calidad"] * prep["CALIDAD"]
+                                               + pesos["popularidad"] * prep["POPULARIDAD"]),
+    }
+    filas = []
+    for nombre, puntaje in estrategias.items():
+        recomendadas = np.array([prep["top_k_por_score"](puntaje(prep["puntajes_consulta"](q)), q)
+                                 for q in consultas])
+        f4 = evaluar_recomendaciones(consultas, recomendadas, prep["GEN"], prep["IDI"], prep["VOTOS"], prep["P75"])
+        for (criterio, valor), esperado in zip(f4.items(), f3[nombre]):
+            filas.append({"estrategia": nombre, "criterio": criterio, "F3 (CSV)": float(esperado),
+                          "F4 (reproducido)": float(valor),
+                          "coincide": bool(np.isclose(valor, esperado, rtol=0, atol=1e-12))})
+    return pd.DataFrame(filas)

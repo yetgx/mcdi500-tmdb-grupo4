@@ -9,7 +9,7 @@ from PIL import Image
 
 from src.f4_puntos_5_7 import (
     _es, analizar_asociacion, cargar_contrato, controles_tecnicos, figura_asociacion_votos,
-    figura_umbral_votos, persistir, persistir_apoyo,
+    figura_umbral_votos, persistir, persistir_apoyo, preparar_evaluacion, verificar_contra_f3,
 )
 
 BASE = Path(__file__).resolve().parents[1]
@@ -123,3 +123,15 @@ def test_apoyo_grafico_versionado_y_separado(tmp_path, entradas, monkeypatch):
     finally:
         plt.close(figura_asociacion)
         plt.close(figura_umbral)
+
+
+def test_capitulo_8_reproduce_la_evaluacion_de_f3():
+    prep = preparar_evaluacion(BASE)
+    assert prep["N_CATALOGO"] == 17978 and len(prep["CONSULTAS_TEST"]) == 3596 and prep["TOP_K"] == 10
+    assert prep["P75"] == pytest.approx(427.75)
+    assert set(prep["vis"].loc[prep["CONSULTAS_TEST"], "movie_id"]) == set(prep["test_f3"]["movie_id"])
+    q = int(prep["CONSULTAS_TEST"][0])
+    elegidas = prep["top_k_por_score"](prep["puntajes_consulta"](q), q)
+    assert len(elegidas) == 10 and q not in elegidas
+    verificacion = verificar_contra_f3(prep, BASE)
+    assert len(verificacion) == 6 and verificacion["coincide"].all()
