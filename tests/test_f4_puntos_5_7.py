@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
 
-import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.figure import Figure
 import pandas as pd
 import pytest
 from PIL import Image
@@ -51,9 +52,11 @@ def test_constante_en_un_estrato():
 
 
 def test_exporta_imagenes_a_200_ppp_y_tabla_unica(tmp_path, entradas):
-    figuras = {f"fig{i}": plt.subplots()[0] for i in range(1, 4)}
+    figuras = {f"fig{i}": Figure() for i in range(1, 4)}
     for figura in figuras.values():
-        figura.axes[0].plot([1, 2], [2, 3])
+        # El CI no necesita una ventana ni una instalación de Tcl/Tk para guardar un PNG.
+        FigureCanvasAgg(figura)
+        figura.subplots().plot([1, 2], [2, 3])
     hallazgos = pd.DataFrame([
         {"figura": clave, "hallazgo": f"Prueba {clave}", "evidencia": "Dato sintético"} for clave in figuras
     ])
@@ -73,4 +76,4 @@ def test_exporta_imagenes_a_200_ppp_y_tabla_unica(tmp_path, entradas):
         assert meta["figuras"] == rutas and meta["controles_superados"] == len(controles)
     finally:
         for figura in figuras.values():
-            plt.close(figura)
+            figura.clear()
