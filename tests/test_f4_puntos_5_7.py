@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 from PIL import Image
 
-from src.f4_puntos_5_7 import analizar_asociacion, cargar_contrato, controles_tecnicos, persistir
+from src.f4_puntos_5_7 import _es, analizar_asociacion, cargar_contrato, controles_tecnicos, persistir
 
 BASE = Path(__file__).resolve().parents[1]
 
@@ -77,3 +77,10 @@ def test_exporta_imagenes_a_200_ppp_y_tabla_unica(tmp_path, entradas):
     finally:
         for figura in figuras.values():
             figura.clear()
+
+
+def test_cifras_con_formato_es_cl(entradas):
+    assert _es(14382) == "14.382" and _es(0.6264, 3) == "0,626" and _es(-0.0231, 3) == "-0,023"
+    detalles = controles_tecnicos(*entradas)["detalle"].astype(str)
+    assert not detalles.str.contains(r"\.\d{4,}").any()
+    assert detalles.str.contains("14.382 + 3.596", regex=False).any()

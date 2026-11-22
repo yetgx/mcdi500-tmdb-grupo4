@@ -20,6 +20,11 @@ COLUMNAS = ("vote_average", "vote_count", "popularity")
 NULOS_INTENCIONALES = {"budget": "budget_clean", "revenue": "revenue_clean"}
 
 
+def _es(valor, decimales=0):
+    """Formato es-CL: punto para miles, coma para decimales."""
+    return f"{valor:,.{decimales}f}".translate({44: ".", 46: ","})
+
+
 def cargar_contrato(raiz):
     rutas = {nombre: Path(raiz) / rel for nombre, rel in ENTRADAS.items()}
     for nombre, ruta in rutas.items():
@@ -96,12 +101,12 @@ def controles_tecnicos(entrenamiento, prueba, diccionario, parametros, original)
     ids = combinado["movie_id"]
     id_ok = all(t["movie_id"].notna().all() and t["movie_id"].is_unique for t in (combinado, original))
     registrar("normal", "Columnas y orden según el diccionario", list(entrenamiento) == list(prueba) == columnas,
-              f"{len(columnas)} columnas")
+              f"{_es(len(columnas))} columnas")
     registrar("normal", "Particiones versionadas: 14.382 + 3.596", (len(entrenamiento), len(prueba)) == (14382, 3596),
-              f"{len(entrenamiento)} + {len(prueba)}")
+              f"{_es(len(entrenamiento))} + {_es(len(prueba))}")
     registrar("normal", "movie_id no nulo, único, sin cruces y mismo conjunto que el original",
               id_ok and len(combinado) == len(original) and set(ids) == set(original["movie_id"]),
-              f"{len(combinado)} ids")
+              f"{_es(len(combinado))} ids")
     valido = id_ok and len(combinado) == len(original) and set(ids) == set(original["movie_id"])
     fuente = original.set_index("movie_id").reindex(ids) if valido else None
     for nombre in COLUMNAS:
@@ -115,7 +120,7 @@ def controles_tecnicos(entrenamiento, prueba, diccionario, parametros, original)
             rtol=0, atol=0,
         )
         registrar("límite", f"{destino}: ceros/nulos conservados como ausentes; montos restantes intactos",
-                  igual, f"{es_nulo.sum()} valores ausentes")
+                  igual, f"{_es(es_nulo.sum())} valores ausentes")
     calidad = parametros["pasos"]["CalidadPonderada(vote_average)"]
     c, m = float(calidad["C"]), float(calidad["m"])
     votos = combinado["vote_count"].to_numpy()
@@ -123,14 +128,14 @@ def controles_tecnicos(entrenamiento, prueba, diccionario, parametros, original)
     esperado = (votos * promedio + m * c) / (votos + m)
     registrar("normal", "Weighted Rating coincide con la fórmula y los parámetros F3",
               m > 0 and np.allclose(combinado["weighted_rating"], esperado, rtol=1e-12, atol=1e-12),
-              f"C={c:.4f}; m={m:g}")
+              f"C={_es(c, 4)}; m={_es(m)}")
     minimo = votos.min()
     banda_minima = votos == minimo
     desvio_original = np.abs(promedio[banda_minima] - c)
     desvio_ponderado = np.abs(combinado["weighted_rating"].to_numpy()[banda_minima] - c)
     registrar("límite", "Con el mínimo de votos observado, Weighted Rating no se aleja de C",
               bool(np.all(desvio_ponderado <= desvio_original + 1e-12)),
-              f"{banda_minima.sum()} películas con {minimo:g} voto(s)")
+              f"{_es(banda_minima.sum())} películas con {_es(minimo)} voto(s)")
     escalas = {
         "weighted_rating": combinado["weighted_rating"].to_numpy(),
         "popularity_log": np.log1p(combinado["popularity"].to_numpy()),
@@ -147,7 +152,7 @@ def controles_tecnicos(entrenamiento, prueba, diccionario, parametros, original)
                   rango > 0 and np.allclose(obtenido, esperado, rtol=1e-12, atol=1e-12)
                   and np.all((obtenido[:len(entrenamiento)] >= -1e-12)
                              & (obtenido[:len(entrenamiento)] <= 1 + 1e-12)),
-                  f"prueba [{de_prueba.min():.9f}, {de_prueba.max():.9f}]; {fuera} fuera de [0, 1]")
+                  f"prueba [{_es(de_prueba.min(), 9)}; {_es(de_prueba.max(), 9)}]; {_es(fuera)} fuera de [0; 1]")
     registrar("límite", "Estrato sin variación: rho no se declara como 0",
               bool(np.isnan(_rho(pd.Series([1, 1]), pd.Series([1, 2])))))
     excepcion("Falta un artefacto", FileNotFoundError, _cargar_en_carpeta_temporal_vacia)
