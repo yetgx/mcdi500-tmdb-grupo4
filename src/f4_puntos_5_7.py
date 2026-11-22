@@ -195,8 +195,8 @@ def persistir(raiz, figuras, hallazgos, controles, parametros):
         ruta = dir_figuras / f"{id_}.png"
         figura.savefig(ruta, dpi=200, bbox_inches="tight")
         rutas[id_] = ruta.relative_to(raiz).as_posix()
-    exportar.to_csv(docs / "hallazgos_f4.csv", index=False)
-    controles.to_csv(docs / "controles_f4.csv", index=False)
+    exportar.to_csv(docs / "hallazgos_f4.csv", index=False, lineterminator="\n")
+    controles.to_csv(docs / "controles_f4.csv", index=False, lineterminator="\n")
     metadata = {"fase": "F4", "semilla_f3": parametros["semilla"],
                 "entradas_contrato": list(ENTRADAS.values()), "figuras": rutas,
                 "controles_superados": len(controles)}
@@ -300,7 +300,7 @@ def persistir_apoyo(raiz, figuras_con_hallazgos, controles):
         figura.savefig(ruta, dpi=200)
         rutas.append(ruta.relative_to(raiz).as_posix())
     csv = carpeta / "hallazgos_apoyo.csv"
-    tabla.to_csv(csv, index=False)
+    tabla.to_csv(csv, index=False, lineterminator="\n")
     return [*rutas, csv.relative_to(raiz).as_posix()]
 
 

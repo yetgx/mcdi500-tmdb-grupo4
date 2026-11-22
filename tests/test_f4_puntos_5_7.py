@@ -135,3 +135,13 @@ def test_capitulo_8_reproduce_la_evaluacion_de_f3():
     assert len(elegidas) == 10 and q not in elegidas
     verificacion = verificar_contra_f3(prep, BASE)
     assert len(verificacion) == 6 and verificacion["coincide"].all()
+
+
+def test_csv_exportados_con_fin_de_linea_lf(tmp_path, entradas):
+    figuras = {f"fig{i}": Figure() for i in range(1, 4)}
+    for figura in figuras.values():
+        FigureCanvasAgg(figura)
+    hallazgos = pd.DataFrame([{"figura": k, "hallazgo": "h", "evidencia": "e"} for k in figuras])
+    persistir(tmp_path, figuras, hallazgos, controles_tecnicos(*entradas), entradas[3])
+    for nombre in ("hallazgos_f4.csv", "controles_f4.csv"):
+        assert b"\r\n" not in (tmp_path / "docs" / nombre).read_bytes()
