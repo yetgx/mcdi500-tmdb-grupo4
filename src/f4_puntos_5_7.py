@@ -51,6 +51,17 @@ def _rho(x, y):
     return float(x.rank(method="average").corr(y.rank(method="average")))
 
 
+def _estratos_idioma(datos):
+    idioma = datos["lang_clean"].astype("string").str.strip().str.lower()
+    conocidos = idioma.notna() & ~idioma.isin(["", "unknown", "und", "xx"])
+    return [
+        ("Catálogo completo", datos),
+        ("Idioma inglés", datos.loc[conocidos & idioma.eq("en").fillna(False)]),
+        ("Otros idiomas conocidos", datos.loc[conocidos & idioma.ne("en").fillna(False)]),
+        ("Idioma no informado", datos.loc[~conocidos]),
+    ]
+
+
 def analizar_asociacion(catalogo):
     """Selecciona el |rho| mayor entre las tres columnas originales; no incluye derivados."""
     convenidas = list(COLUMNAS)
@@ -65,14 +76,7 @@ def analizar_asociacion(catalogo):
     if candidatos.empty:
         raise ValueError("No se puede calcular Spearman con columnas constantes.")
     x, y = candidatos.sort_values("fuerza", ascending=False, kind="stable").iloc[0][["x", "y"]]
-    idioma = datos["lang_clean"].astype("string").str.strip().str.lower()
-    conocidos = idioma.notna() & ~idioma.isin(["", "unknown", "und", "xx"])
-    grupos = [
-        ("Catálogo completo", datos),
-        ("Idioma inglés", datos.loc[conocidos & idioma.eq("en").fillna(False)]),
-        ("Otros idiomas conocidos", datos.loc[conocidos & idioma.ne("en").fillna(False)]),
-        ("Idioma no informado", datos.loc[~conocidos]),
-    ]
+    grupos = _estratos_idioma(datos)
     estratos = pd.DataFrame([
         {"grupo": grupo, "n": len(tabla), "rho": _rho(tabla[x], tabla[y])}
         for grupo, tabla in grupos
@@ -191,8 +195,8 @@ def persistir(raiz, figuras, hallazgos, controles, parametros):
         ruta = dir_figuras / f"{id_}.png"
         figura.savefig(ruta, dpi=200, bbox_inches="tight")
         rutas[id_] = ruta.relative_to(raiz).as_posix()
-    exportar.to_csv(docs / "hallazgos_f4.csv", index=False)
-    controles.to_csv(docs / "controles_f4.csv", index=False)
+    exportar.to_csv(docs / "hallazgos_f4.csv", index=False, lineterminator="\n")
+    controles.to_csv(docs / "controles_f4.csv", index=False, lineterminator="\n")
     metadata = {"fase": "F4", "semilla_f3": parametros["semilla"],
                 "entradas_contrato": list(ENTRADAS.values()), "figuras": rutas,
                 "controles_superados": len(controles)}
@@ -200,3 +204,190 @@ def persistir(raiz, figuras, hallazgos, controles, parametros):
         json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8",
     )
     return rutas
+
+
+def figura_asociacion_votos(catalogo):
+    """Gráfico complementario: densidad y Spearman sobre los mismos casos completos."""
+    from matplotlib import pyplot as plt
+    from matplotlib.colors import LogNorm
+
+    datos = catalogo.loc[:, [*COLUMNAS, "lang_clean"]].dropna(subset=list(COLUMNAS))
+    _, ingles, otros, sin_idioma = _estratos_idioma(datos)
+    x, y = "vote_count", "popularity"
+    valores = datos[[x, y]].to_numpy()
+    if not (np.isfinite(valores).all() and (valores >= 0).all()):
+        raise ValueError("Votos y popularidad deben ser finitos y no negativos para graficar log(1 + valor).")
+
+    log_valores = np.log1p(valores)
+    bajos = log_valores.min(axis=0)
+    altos = log_valores.max(axis=0)
+    margen = np.maximum((altos - bajos) * 0.02, 0.01)
+    extension = (bajos[0] - margen[0], altos[0] + margen[0],
+                 bajos[1] - margen[1], altos[1] + margen[1])
+    figura, ejes = plt.subplots(1, 2, figsize=(9, 4.4), sharex=True, sharey=True, layout="constrained")
+    mallas = []
+    resumen = []
+    for eje, (nombre, tabla) in zip(ejes, [ingles, otros]):
+        rho = _rho(tabla[x], tabla[y])
+        rho_txt = _es(rho, 3) if np.isfinite(rho) else "no definido"
+        resumen.append(f"{nombre}: ρ={rho_txt} (n={_es(len(tabla))})")
+        malla = eje.hexbin(np.log1p(tabla[x]), np.log1p(tabla[y]), extent=extension,
+                         gridsize=32, mincnt=1, cmap="viridis")
+        mallas.append(malla)
+        eje.set_title(f"{nombre}\nρ de Spearman={rho_txt} · n={_es(len(tabla))}")
+        eje.set_xlabel("log(1 + número de votos)")
+        eje.set_xlim(extension[:2])
+        eje.set_ylim(extension[2:])
+    maximo = max((malla.get_array().max() for malla in mallas if malla.get_array().size), default=1)
+    norma = LogNorm(vmin=1, vmax=max(2, maximo))
+    for malla in mallas:
+        malla.set_norm(norma)
+    ejes[0].set_ylabel("log(1 + popularidad TMDB)")
+    figura.colorbar(mallas[-1], ax=ejes, label="Películas por celda (escala log)")
+    titulo = "La asociación entre votos y popularidad varía según el idioma"
+    figura.suptitle(titulo, fontweight="bold")
+    figura.supxlabel("Fuente: particiones versionadas de F3. Misma escala y recuento por celda en ambos grupos.",
+                     fontsize=8)
+    evidencia = "; ".join(resumen) + f"; idioma no informado fuera de la figura: {_es(len(sin_idioma[1]))}."
+    return figura, {"figura": "p05_votos_popularidad", "hallazgo": titulo,
+                    "evidencia": evidencia + " Asociación descriptiva, no causal."}
+
+
+def figura_umbral_votos(original):
+    """Diagnóstico complementario del corte de evaluación: P75 del catálogo original."""
+    from matplotlib import pyplot as plt
+
+    votos = original["vote_count"].dropna()
+    valores = votos.to_numpy()
+    if not len(votos) or not (np.isfinite(valores).all() and (valores >= 0).all()
+                             and np.equal(valores, np.floor(valores)).all()):
+        raise ValueError("Se necesitan recuentos de votos enteros, finitos y no negativos.")
+    p75 = votos.quantile(0.75)
+    corte = int(np.ceil(p75))
+    cantidad = int(votos.ge(corte).sum())
+    porcentaje = 100 * cantidad / len(votos)
+    figura, eje = plt.subplots(figsize=(8, 4), layout="constrained")
+    eje.hist(np.log1p(votos), bins=38, color="#437f90", edgecolor="white", linewidth=0.45)
+    eje.axvline(np.log1p(p75), color="#9a391e", linestyle="--", linewidth=2,
+                label=f"P75 = {_es(p75, 2)}; corte ≥ {_es(corte)} votos")
+    eje.set(xlabel="log(1 + número de votos)", ylabel="Películas por intervalo (n)")
+    eje.legend(frameon=False)
+    titulo = "El corte de respaldo de votos deja fuera a la mayoría del catálogo"
+    eje.set_title(titulo, fontweight="bold")
+    figura.supxlabel(f"Fuente: data/raw/movies_raw.csv · {_es(len(votos))} películas con votos informados.",
+                     fontsize=8)
+    evidencia = (f"P75 del catálogo: {_es(p75, 2)} votos. {_es(cantidad)} de {_es(len(votos))} películas "
+                 f"({_es(porcentaje, 1)} %) alcanzan al menos {_es(corte)} votos. "
+                 "No es el parámetro m del Weighted Rating, estimado con entrenamiento.")
+    return figura, {"figura": "p06_umbral_respaldo_votos", "hallazgo": titulo, "evidencia": evidencia}
+
+
+def persistir_apoyo(raiz, figuras_con_hallazgos, controles):
+    """Guarda solo los gráficos complementarios de este aporte; no toca la entrega final."""
+    if controles.empty or not controles["estado"].eq("OK").all():
+        raise ValueError("Hay controles técnicos sin superar; no se exportará el apoyo visual.")
+    apoyo = list(figuras_con_hallazgos)
+    tabla = pd.DataFrame(h for _, h in apoyo)
+    esperadas = {"p05_votos_popularidad", "p06_umbral_respaldo_votos"}
+    if len(tabla) != len(esperadas) or "figura" not in tabla or set(tabla["figura"]) != esperadas:
+        raise ValueError("El apoyo visual necesita las dos figuras complementarias con sus hallazgos.")
+    raiz = Path(raiz)
+    carpeta = raiz / "F4/figuras/apoyo_puntos_5_7"
+    carpeta.mkdir(parents=True, exist_ok=True)
+    rutas = []
+    for figura, hallazgo in apoyo:
+        ruta = carpeta / f"{hallazgo['figura']}.png"
+        figura.savefig(ruta, dpi=200)
+        rutas.append(ruta.relative_to(raiz).as_posix())
+    csv = carpeta / "hallazgos_apoyo.csv"
+    tabla.to_csv(csv, index=False, lineterminator="\n")
+    return [*rutas, csv.relative_to(raiz).as_posix()]
+
+
+# ---- Capítulo 8: mismo protocolo de evaluación que F3 -------------------------------
+
+METRICAS = {
+    "Género compartido": "genero_compartido",
+    "Idioma coincidente": "idioma_coincidente",
+    "Votos sobre P75": "votos_p75",
+}
+
+
+def preparar_evaluacion(raiz):
+    """Catálogo, recomendador y atributos originales con el protocolo de F3 (sección 6).
+
+    Catálogo = entrenamiento + prueba, en ese orden; vocabulario aprendido en
+    entrenamiento; consultas = posiciones de prueba; pesos de parametros_f3.json.
+    Género, idioma y votos salen del CSV original, unidos por movie_id.
+    """
+    from .recomendador import RecomendadorHibrido
+    from .recursividad import top_k_vectorizado
+
+    entrenamiento, prueba, _, parametros, _ = cargar_contrato(raiz)
+    catalogo = pd.concat([entrenamiento, prueba], ignore_index=True)
+    original = pd.read_csv(Path(raiz) / ENTRADAS["original"],
+                           usecols=["movie_id", "title", "genres", "original_language", "vote_count"])
+    vis = catalogo[["movie_id"]].merge(original, on="movie_id", how="left", validate="one_to_one",
+                                       indicator=True)
+    if not vis["_merge"].eq("both").all():
+        raise ValueError("Hay películas del catálogo F3 que no están en el CSV original.")
+    vis = vis.drop(columns="_merge")
+
+    pesos = parametros["recomendador"]["pesos"]
+    top_k = int(parametros["recomendador"]["n"])
+    vocabulario = RecomendadorHibrido().ajustar(entrenamiento).vectorizador
+    recomendador = RecomendadorHibrido(pesos["similitud"], pesos["calidad"], pesos["popularidad"],
+                                       n=top_k).ajustar(catalogo, vectorizador=vocabulario)
+
+    def puntajes_consulta(q):
+        """Coseno de la película q contra todo el catálogo."""
+        return recomendador.similitudes([q])[0]
+
+    def top_k_por_score(puntajes, q):
+        """Las TOP_K posiciones de mayor puntaje, sin la consultada; mismo selector que F3."""
+        puntajes = np.array(puntajes, dtype=float, copy=True)
+        puntajes[q] = -np.inf
+        return top_k_vectorizado(puntajes, top_k)
+
+    return {
+        "vis": vis,
+        "test_f3": prueba,
+        "recomendador": recomendador,
+        "PESOS": dict(pesos),
+        "GEN": vis["genres"].fillna("").str.split("|").map(lambda g: {x for x in g if x}).to_numpy(),
+        "IDI": vis["original_language"].to_numpy(dtype=object),
+        "VOTOS": vis["vote_count"].to_numpy(dtype=float),
+        "P75": float(original["vote_count"].quantile(0.75)),
+        "CALIDAD": catalogo["score_quality_norm"].to_numpy(dtype=float),
+        "POPULARIDAD": catalogo["score_popularity_norm"].to_numpy(dtype=float),
+        "N_CATALOGO": len(catalogo),
+        "TOP_K": top_k,
+        "CONSULTAS_TEST": np.arange(len(entrenamiento), len(catalogo)),
+        "puntajes_consulta": puntajes_consulta,
+        "top_k_por_score": top_k_por_score,
+        "METRICAS": dict(METRICAS),
+    }
+
+
+def verificar_contra_f3(prep, raiz):
+    """Recalcula solo similitud e híbrido con las funciones del capítulo 8 y los compara con el CSV de F3."""
+    from .recomendador import evaluar_recomendaciones
+
+    f3 = pd.read_csv(Path(raiz) / "F3/results/evaluacion_recomendador.csv", index_col=0)
+    pesos = prep["PESOS"]
+    consultas = prep["CONSULTAS_TEST"]
+    estrategias = {
+        "Solo similitud": lambda s: s,
+        "Híbrido (pesos elegidos)": lambda s: (pesos["similitud"] * s + pesos["calidad"] * prep["CALIDAD"]
+                                               + pesos["popularidad"] * prep["POPULARIDAD"]),
+    }
+    filas = []
+    for nombre, puntaje in estrategias.items():
+        recomendadas = np.array([prep["top_k_por_score"](puntaje(prep["puntajes_consulta"](q)), q)
+                                 for q in consultas])
+        f4 = evaluar_recomendaciones(consultas, recomendadas, prep["GEN"], prep["IDI"], prep["VOTOS"], prep["P75"])
+        for (criterio, valor), esperado in zip(f4.items(), f3[nombre]):
+            filas.append({"estrategia": nombre, "criterio": criterio, "F3 (CSV)": float(esperado),
+                          "F4 (reproducido)": float(valor),
+                          "coincide": bool(np.isclose(valor, esperado, rtol=0, atol=1e-12))})
+    return pd.DataFrame(filas)
