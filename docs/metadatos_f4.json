@@ -1,0 +1,17 @@
+{
+  "fase": "F4",
+  "semilla_f3": 42,
+  "entradas_contrato": [
+    "data/processed/entrenamiento_f3.csv",
+    "data/processed/prueba_f3.csv",
+    "data/processed/movies_procesado_diccionario.csv",
+    "data/processed/parametros_f3.json",
+    "data/raw/movies_raw.csv"
+  ],
+  "figuras": {
+    "f1_nota_ponderada_por_votos": "F4/figuras/f1_nota_ponderada_por_votos.png",
+    "f2_tiempo_memoria_top_k": "F4/figuras/f2_tiempo_memoria_top_k.png",
+    "f3_evaluacion_azar_similitud_hibrido": "F4/figuras/f3_evaluacion_azar_similitud_hibrido.png"
+  },
+  "controles_superados": 15
+}

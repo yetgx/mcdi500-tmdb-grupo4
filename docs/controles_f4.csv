@@ -1,0 +1,16 @@
+escenario,control,estado,detalle
+normal,Columnas y orden según el diccionario,OK,16 columnas
+normal,Particiones versionadas: 14.382 + 3.596,OK,14.382 + 3.596
+normal,"movie_id no nulo, único, sin cruces y mismo conjunto que el original",OK,17.978 ids
+normal,vote_average coincide con el original por movie_id,OK,
+normal,vote_count coincide con el original por movie_id,OK,
+normal,popularity coincide con el original por movie_id,OK,
+límite,budget_clean: ceros/nulos conservados como ausentes; montos restantes intactos,OK,12.463 valores ausentes
+límite,revenue_clean: ceros/nulos conservados como ausentes; montos restantes intactos,OK,11.156 valores ausentes
+normal,Weighted Rating coincide con la fórmula y los parámetros F3,OK,"C=6,3270; m=421"
+límite,"Con el mínimo de votos observado, Weighted Rating no se aleja de C",OK,226 películas con 50 voto(s)
+límite,score_quality_norm: MinMax de entrenamiento sin recorte en prueba,OK,"prueba [-0,023062787; 1,011904918]; 3 fuera de [0; 1]"
+límite,score_popularity_norm: MinMax de entrenamiento sin recorte en prueba,OK,"prueba [0,006894797; 0,969686414]; 0 fuera de [0; 1]"
+límite,Estrato sin variación: rho no se declara como 0,OK,
+excepción,Falta un artefacto,OK,FileNotFoundError
+excepción,Asociación con una fila,OK,ValueError
