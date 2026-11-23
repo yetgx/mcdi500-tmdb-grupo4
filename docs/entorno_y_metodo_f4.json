@@ -1,0 +1,25 @@
+{
+  "generado_utc": "2026-11-23T00:01:03.244264+00:00",
+  "repo": "yetgx/mcdi500-tmdb-grupo4",
+  "commit_ejecutado": "56a1f42d499e726f68c6d79781c1006136cf8ff0",
+  "python": "3.13.0",
+  "sistema": "Windows-11-10.0.26300-SP0",
+  "pandas": "3.1.1",
+  "numpy": "2.5.4",
+  "matplotlib": "3.11.2",
+  "semilla": 42,
+  "consultas_prueba": 3596,
+  "top_k": 10,
+  "bootstrap_repeticiones": 1500,
+  "pesos_evaluados": [
+    0.5,
+    0.5,
+    0.0
+  ],
+  "fuente_train": "data/processed/entrenamiento_f3.csv",
+  "fuente_test": "data/processed/prueba_f3.csv",
+  "fuente_parametros": "data/processed/parametros_f3.json",
+  "fuente_evaluacion_f3": "F3/results/evaluacion_recomendador.csv",
+  "peso_maximin_train": 0.5,
+  "protocolo": "recomendador de src/recomendador.py con los pesos de parametros_f3.json; reproduce F3/results/evaluacion_recomendador.csv (6 de 6 cifras iguales)"
+}
