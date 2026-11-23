@@ -1,0 +1,10 @@
+﻿hallazgo,valor,detalle,fuente
+Género compartido: híbrido frente al azar,"98,97% vs 42,63%","diferencia +56,34 pp; IC95% diferencia [+55,60, +57,11] pp",3.596 consultas de prueba de F3; bootstrap por consulta
+Idioma coincidente: híbrido frente al azar,"81,35% vs 36,67%","diferencia +44,68 pp; IC95% diferencia [+43,85, +45,55] pp",3.596 consultas de prueba de F3; bootstrap por consulta
+Votos sobre P75: híbrido frente al azar,"80,03% vs 24,98%","diferencia +55,04 pp; IC95% diferencia [+54,13, +55,94] pp",3.596 consultas de prueba de F3; bootstrap por consulta
+Peso de calidad maximin exploratorio,"0,50","Rejilla de F3 sobre consultas de entrenamiento; F3 eligió 0,50 con la regla maximin","F3/results/rejilla_pesos.csv (entrenamiento), no estimada sobre prueba"
+Coherencia lingüística en Inglés (en),"98,85%",2.109 consultas,Desagregación de test F3
+Coherencia lingüística en Otros idiomas,"56,53%",1.487 consultas,Desagregación de test F3
+Exposición de catálogo: Aleatorio,"86,49%","Top-10 concentra 0,23%",Recomendaciones test F3
+Exposición de catálogo: Híbrido F4,"20,99%","Top-10 concentra 16,52%",Recomendaciones test F3
+Exposición de catálogo: Solo similitud,"49,25%","Top-10 concentra 3,60%",Recomendaciones test F3
