@@ -14,14 +14,11 @@ Estadística Computacional para la Toma de Decisiones (UNAB, 2026-83).
 
 ## Entorno
 
-Usa el entorno del repo (`requirements.txt` de la raíz, Python 3.13.0): agregar ahí `scipy`, `statsmodels`, `imbalanced-learn`, `seaborn`, `joblib` al comenzar MCDI501. Los datos van en `mcdi501/data/raw/` y no se versionan. El docente versiona los notebooks sin salidas (`nbstripout`); la copia para Canvas va ejecutada.
+MCDI501 tiene su propio entorno, separado del de MCDI500 (otras librerías). Desde `mcdi501/`:
 
-## Verificar contra la rúbrica
+    py -3.13 -m venv .venv            # macOS/Linux: python3.13 -m venv .venv
+    .venv\Scriptsctivate           # macOS/Linux: source .venv/bin/activate
+    python -m pip install -r requirements.txt
+    nbstripout --install              # el docente versiona los notebooks sin salidas
 
-Desde la raíz del repo personal `Magister CDIA` (no de este repo):
-
-```bash
-python -m evaluador cursos/mcdi501-estadistica-computacional/evaluaciones/formativa-1-eda-inferencia --guardar
-```
-
-Escribe `revision.md` en la carpeta de la evaluación con lo que cumple, lo que falta y lo que hay que revisar a mano.
+`requirements.txt` lista las librerías del curso sin fijar versión; al empezar la Formativa 1, fijarlas con `pip freeze` para que el entorno sea reproducible. Los datos van en `data/raw/` y no se versionan. La copia de cada notebook que se sube a Canvas va ejecutada.
