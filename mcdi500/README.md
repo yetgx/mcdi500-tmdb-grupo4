@@ -2,7 +2,7 @@
 
 > Esta carpeta es el módulo MCDI500 del repositorio del Grupo 4. Todos los comandos de este README se ejecutan **dentro de `mcdi500/`**. El módulo MCDI501 está en [`../mcdi501/`](../mcdi501/).
 
-[![Reproducibilidad](https://github.com/yetgx/mcdi500-tmdb-grupo4/actions/workflows/reproducibilidad.yml/badge.svg)](https://github.com/yetgx/mcdi500-tmdb-grupo4/actions/workflows/reproducibilidad.yml)
+[![Reproducibilidad](https://github.com/yetgx/mcdi-2026-grupo4/actions/workflows/reproducibilidad.yml/badge.svg)](https://github.com/yetgx/mcdi-2026-grupo4/actions/workflows/reproducibilidad.yml)
 
 Proyecto de MCDI500 (Programación para la Ciencia de Datos, Magíster en Ciencia de Datos e Inteligencia Artificial, UNAB). Trabaja con un extracto de The Movie Database (TMDB) con estrenos entre 2010 y 2025: presupuesto, recaudación, duración, géneros, productoras, países, idiomas, valoración y popularidad. El proyecto construye un recomendador híbrido de películas: similitud de contenido (géneros, productoras e idioma) ponderada por calidad (*Weighted Rating*) y popularidad.
 

@@ -1,4 +1,4 @@
-# MCDI501 · Proyecto del grupo (dentro del repo `mcdi500-tmdb-grupo4`)
+# MCDI501 · Proyecto del grupo (dentro del repo `mcdi-2026-grupo4`)
 
 Estadística Computacional para la Toma de Decisiones (UNAB, 2026-83).
 

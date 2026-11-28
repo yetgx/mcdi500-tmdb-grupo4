@@ -1,4 +1,6 @@
-# MCDI · Grupo 4
+# MCDI 2026 · Grupo 4
+
+[![Reproducibilidad MCDI500](https://github.com/yetgx/mcdi-2026-grupo4/actions/workflows/reproducibilidad.yml/badge.svg)](https://github.com/yetgx/mcdi-2026-grupo4/actions/workflows/reproducibilidad.yml)
 
 Repositorio del Grupo 4 del Magíster en Ciencia de Datos e Inteligencia Artificial (UNAB). Una carpeta por módulo; cada una es autocontenida (código, datos, informes, pruebas y entorno propios).
 
