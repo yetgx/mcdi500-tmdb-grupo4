@@ -22,8 +22,8 @@ Para el grupo 4 · MCDI500. Tiempo de lectura: 5 minutos. Tiempo de hacerlo: 2 m
 1. Instala **GitHub Desktop**: https://desktop.github.com
 2. Inicia sesión con tu cuenta de GitHub (`File → Options → Accounts`).
 3. `File → Clone repository` → pestaña **URL** → pega:
-   `https://github.com/yetgx/mcdi500-tmdb-grupo4.git` → elige una carpeta → **Clone**.
-4. Prepara el entorno (ver [README](../README.md), sección *Requisitos y ejecución*).
+   `https://github.com/yetgx/mcdi-2026-grupo4.git` → elige una carpeta → **Clone**.
+4. Prepara el entorno (ver [README de mcdi500](../README.md), sección *Requisitos y ejecución*).
 
 ### Cada vez que quieras subir algo
 
@@ -44,8 +44,8 @@ Listo. Avisa al grupo por WhatsApp con el enlace del PR.
 
 ### Una sola vez
 ```bash
-git clone https://github.com/yetgx/mcdi500-tmdb-grupo4.git
-cd mcdi500-tmdb-grupo4
+git clone https://github.com/yetgx/mcdi-2026-grupo4.git
+cd mcdi-2026-grupo4
 git config user.name  "Tu Nombre"
 git config user.email "tu-correo-de-github@ejemplo.com"
 ```
@@ -125,7 +125,7 @@ Si responde con un número de versión, ya lo tienes.
 
 **Paso 5 · Clonar el repo** (si aún no lo tienes; ver Opción B)
 ```
-git clone https://github.com/yetgx/mcdi500-tmdb-grupo4.git
+git clone https://github.com/yetgx/mcdi-2026-grupo4.git
 ```
 
 ### Cada vez: abrir el asistente dentro del repo

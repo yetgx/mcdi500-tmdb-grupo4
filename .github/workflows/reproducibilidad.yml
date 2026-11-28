@@ -1,12 +1,14 @@
 # Verifica en Linux, macOS y Windows que el entorno se instala desde
 # requirements.txt, que las pruebas pasan y que los notebooks corren completos
 # y regeneran el mismo conjunto procesado que está versionado.
-name: Reproducibilidad
+name: Reproducibilidad MCDI500
 
 on:
   push:
     branches: [main]
+    paths: ['mcdi500/**', '.github/workflows/reproducibilidad.yml']
   pull_request:
+    paths: ['mcdi500/**', '.github/workflows/reproducibilidad.yml']
   workflow_dispatch:
 
 jobs:
@@ -21,12 +23,13 @@ jobs:
     defaults:
       run:
         shell: bash
+        working-directory: mcdi500
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version-file: .python-version
+          python-version-file: mcdi500/.python-version
 
       - name: Instalar dependencias en un entorno virtual
         run: |
@@ -52,8 +55,8 @@ jobs:
 
       - name: El conjunto regenerado coincide con el versionado
         run: |
-          git show HEAD:data/processed/movies_procesado.csv > versionado.csv
-          git show HEAD:data/processed/movies_bow_matrix.npz > versionado.npz
+          git show HEAD:mcdi500/data/processed/movies_procesado.csv > versionado.csv
+          git show HEAD:mcdi500/data/processed/movies_bow_matrix.npz > versionado.npz
           python - <<'EOF'
           import pandas as pd
           from scipy import sparse
@@ -66,4 +69,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: notebooks-ejecutados-${{ matrix.os }}
-          path: ejecutados/
+          path: mcdi500/ejecutados/

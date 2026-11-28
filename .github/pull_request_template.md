@@ -5,6 +5,7 @@
 <!-- Motivo y, si aplica, cifras (filas afectadas, % de nulos, etc.). Va a la bitácora. -->
 
 ## Checklist
+- [ ] Módulo afectado indicado en el título (`[mcdi500]` o `[mcdi501]`)
 - [ ] El/los notebook(s) corren completos con *Restart Kernel and Run All*
 - [ ] Rutas relativas y semilla 42
 - [ ] `data/raw/` sin modificar

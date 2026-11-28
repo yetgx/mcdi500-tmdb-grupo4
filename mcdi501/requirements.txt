@@ -1,0 +1,13 @@
+# Librerías del curso (README del docente: github.com/jpmaidana/MCDI501-202683).
+# Sin versión fijada todavía: fijarlas con `pip freeze` al empezar la Formativa 1.
+numpy
+pandas
+scipy
+statsmodels
+scikit-learn
+imbalanced-learn
+matplotlib
+seaborn
+joblib
+jupyterlab
+nbstripout
