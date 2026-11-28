@@ -17,7 +17,7 @@ Estadística Computacional para la Toma de Decisiones (UNAB, 2026-83).
 MCDI501 tiene su propio entorno, separado del de MCDI500 (otras librerías). Desde `mcdi501/`:
 
     py -3.13 -m venv .venv            # macOS/Linux: python3.13 -m venv .venv
-    .venv\Scriptsctivate           # macOS/Linux: source .venv/bin/activate
+    .venv\Scripts\activate           # macOS/Linux: source .venv/bin/activate
     python -m pip install -r requirements.txt
     nbstripout --install              # el docente versiona los notebooks sin salidas
 
